@@ -1,8 +1,9 @@
 import { IContent } from "./content.interface";
 
 
-const createContent = async (content: IContent) => {
-
+const createContent = async (file: any, content: IContent) => {
+    console.log('file', file),
+    console.log('content', content);
 }
 
 
