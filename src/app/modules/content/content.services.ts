@@ -1,20 +1,22 @@
 import { IContent } from "./content.interface";
+import { Content } from "./content.model";
 
 
-const createContent = async (file: any, content: IContent) => {
-    console.log('file', file);
+const createContent = async (file: any, content: IContent, user: any): Promise<IContent> => {
 
     if (file) {
         if (file.mimetype.startsWith("image/")) {
-            content.imageUrl = file.path;
+            content.imageUrl = `/uploads/${file.filename}`;
+            content.userId = user?.id;
         } else if (file.mimetype.startsWith("video/")) {
-            content.videoUrl = file.path;
+            content.videoUrl = `/uploads/${file.filename}`;
+            content.userId = user?.id;
         } else {
             throw new Error("Invalid file type. Only images and videos are allowed.");
         }
     }
-    console.log(content);
-
+    const result = await Content.create(content)
+    return result
 }
 export const contentServices = {
     createContent,
