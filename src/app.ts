@@ -7,6 +7,7 @@ import globalErrorHandler from './app/middlewares/globalErrorHandler'
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import initialChats from './app/modules/chats/chats.socket';
+import path from 'path';
 const app: Application = express()
 
 
@@ -19,6 +20,8 @@ app.set("io",io)
 app.use(express.json())
 app.use(cors())
 app.use(cookieParser());
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/v1', router)
 
 app.use(globalErrorHandler)
