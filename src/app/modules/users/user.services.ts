@@ -5,6 +5,7 @@ import { IUser } from "./user.interface";
 import { User } from "./user.model"
 import { ITrainer } from '../trainer/trainer.interface';
 import { Trainer } from '../trainer/trainer.model';
+import mongoose from 'mongoose';
 
 const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeData: ITrainee): Promise<ITrainee | undefined> => {
     const userData = {
@@ -52,7 +53,64 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
     }
 }
 
+const getMe = async (user: any) => {
+    const userId = new mongoose.Types.ObjectId(user.id);
+    const result = await User.aggregate([
+        {
+            $match: { _id: userId },
+        },
+        {
+            $lookup: {
+                from: 'trainers',
+                localField: '_id',
+                foreignField: 'user',
+                as: 'trainerDetails',
+            },
+        },
+        {
+            $lookup: {
+                from: 'trainees',
+                localField: '_id',
+                foreignField: 'user',
+                as: 'traineeDetails',
+            },
+        },
+        // Filter out empty arrays before returning the result
+        {
+            $addFields: {
+                trainerDetails: {
+                    $cond: { if: { $ne: ["$trainerDetails", []] }, then: "$trainerDetails", else: "$$REMOVE" },
+                },
+                traineeDetails: {
+                    $cond: { if: { $ne: ["$traineeDetails", []] }, then: "$traineeDetails", else: "$$REMOVE" },
+                },
+            },
+        },
+    ]);
+    return result;
+};
+
+// const getMeTrainee = async (user: any) => {
+//     const userId = new mongoose.Types.ObjectId(user.id);
+//     const result = await User.aggregate([
+//         {
+//             $match: { _id: userId },
+//         },
+//         {
+//             $lookup: {
+//                 from: 'trainees',
+//                 localField: '_id',
+//                 foreignField: 'user',
+//                 as: 'traineeDetails',
+//             },
+//         },
+//     ]);
+//     return result
+// }
+
 export const userServices = {
     createTrainee,
     createTrainer,
+    getMe,
+    // getMeTrainee,
 }
