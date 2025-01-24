@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { userController } from "./user.controller";
+import auth from "../../middlewares/auth";
 // import validateRequest from "../../middlewares/validateRequest";
 // import { userValidationSchema } from "./user.validation";
 
@@ -10,5 +11,7 @@ router.post('/create-trainee',
     userController.createTrainee)
 
 router.post('/create-trainer', userController.createTrainer)
+router.get('/get-me', auth(), userController.getMe)
+// router.get('/get-me-trainee', auth(), userController.getMeTrainee)
 
 export const UserRouter = router;

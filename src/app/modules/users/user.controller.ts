@@ -53,7 +53,53 @@ const createTrainer = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user;
+        console.log(user);
+        const result = await userServices.getMe(user);
+        res.status(200).json({
+            success: true,
+            message: 'get my data successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+// const getMeTrainee = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const user = req.user;
+//         console.log(user);
+//         const result = await userServices.getMeTrainee(user);
+//         res.status(200).json({
+//             success: true,
+//             message: 'get my data successfully',
+//             data: result,
+//         })
+//         // sendResponse(res, {
+//         //     statusCode: httpStatus.OK,
+//         //     success: true,
+//         //     message: 'user created successfully',
+//         //     data: result,
+//         // });
+//     }
+//     catch (error) {
+//         next(error)
+//     }
+// }
+
 export const userController = {
     createTrainee,
     createTrainer,
+    getMe,
+    // getMeTrainee,
 }
