@@ -14,7 +14,7 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
         role: "trainee",
         status: 'in-progress',
     }
-    
+
     const userNameExist = await Trainee.findOne({ userName: validateTraineeData.userName })
     if (userNameExist) {
         throw new AppError(400, 'User Name already exists!')
@@ -36,7 +36,7 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
     }
 }
 
-const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerData: ITrainer): Promise<ITrainer | undefined> => {
+const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerData: ITrainer, file:any): Promise<ITrainer | undefined> => {
     const userData = {
         email: validateUserInfo?.email,
         password: validateUserInfo?.password,
@@ -54,6 +54,7 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
 
     if (result?._id) {
         validateTrainerData.user = result?._id
+        validateTrainerData.profileImageUrl = `/uploads/${file.filename}`;
         const trainerResult = await Trainer.create(validateTrainerData)
         return trainerResult
     }

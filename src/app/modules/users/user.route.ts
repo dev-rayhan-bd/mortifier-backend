@@ -12,7 +12,9 @@ router.post('/create-trainee',
     // validateRequest(userValidationSchema),
     userController.createTrainee)
 
-router.post('/create-trainer', userController.createTrainer)
+router.post('/create-trainer', 
+    upload.single('file'),
+    userController.createTrainer)
 router.get('/get-me', auth(), userController.getMe)
 // router.get('/get-me-trainee', auth(), userController.getMeTrainee)
 

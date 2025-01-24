@@ -34,11 +34,13 @@ const createTrainee = async (req: Request, res: Response, next: NextFunction) =>
 
 const createTrainer = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userInfo, trainerData } = req.body;
+        const file = req.file
+        const data = JSON.parse(req.body.data)
+        const { userInfo, trainerData } = data;
         console.log(userInfo, trainerData);
         const validateUserInfo = userValidationSchema.parse(userInfo)
         const validateTrainerData = trainerValidatedSchema.parse(trainerData)
-        const result = await userServices.createTrainer(validateUserInfo, validateTrainerData);
+        const result = await userServices.createTrainer(validateUserInfo, validateTrainerData, file);
         res.status(200).json({
             success: true,
             message: 'trainer created successfully',
