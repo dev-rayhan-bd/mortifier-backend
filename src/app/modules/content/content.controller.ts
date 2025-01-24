@@ -54,8 +54,16 @@ const getSingleContent = async (req: Request, res: Response, next: NextFunction)
 const getMyContent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = req.user
-        console.log(user);
-        const result = await contentServices.getMyContent(user)
+        const { limit, page, sortBy, sortOrder, searchTerm } = req.query;
+
+        const paginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
+        };
+        console.log(paginationOptions);
+        const result = await contentServices.getMyContent(user,paginationOptions, searchTerm)
         res.status(200).json({
             success: true,
             message: 'get my content successfully',

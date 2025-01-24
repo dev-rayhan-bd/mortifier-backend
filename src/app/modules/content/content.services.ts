@@ -28,10 +28,50 @@ const getSingleContent = async (id: string): Promise<IContent | null> => {
     return result
 }
 
-const getMyContent = async (user: any,): Promise<IContent[] | null> => {
-    const result = await Content.find({ userId: user?.id })
-    return result
-}
+const getMyContent = async (
+    user: any,
+    paginationOptions: any,
+    searchTerm: any
+): Promise<any> => {
+    const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
+
+    const contentSearchableFields = ["title", "content", "specialism"];
+    const andConditions: any[] = [
+        {
+            userId: user?.id,
+        },
+    ];
+
+    if (searchTerm) {
+        andConditions.push({
+            $or: contentSearchableFields.map((field) => ({
+                [field]: {
+                    $regex: searchTerm,
+                    $options: "i",
+                },
+            })),
+        });
+    }
+
+    const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
+
+    const result = await Content.find(whereConditions)
+        .limit(limit)
+        .skip(skip)
+        .sort(sortBy ? { [sortBy]: sortOrder === "asc" || sortOrder === "ascending" ? 1 : -1 } : {});
+
+    const total = await Content.countDocuments(whereConditions);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+        },
+        data: result,
+    };
+};
+
 
 const getAllContent = async (
     paginationOptions: any,
