@@ -36,11 +36,13 @@ const getMyContent = async (user: any,): Promise<IContent[] | null> => {
 const getAllContent = async (
     paginationOptions: any,
     searchTerm: any,
+    role: any,
     filtersData: any
 ): Promise<any> => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
 
     const andConditions = [];
+
 
     const contentSearchableFields = ["title", "content", "specialism"];
 
@@ -49,7 +51,7 @@ const getAllContent = async (
             $or: contentSearchableFields.map((field) => ({
                 [field]: {
                     $regex: searchTerm,
-                    $options: "i", // Case-insensitive search
+                    $options: "i",
                 },
             })),
         });
@@ -63,35 +65,91 @@ const getAllContent = async (
         });
     }
 
-    const sortConditions: { [key: string]: SortOrder } = {};
+    const sortConditions: { [key: string]: 1 | -1 } = {};
     if (sortBy && sortOrder) {
-        sortConditions[sortBy] = sortOrder;
+        sortConditions[sortBy] = sortOrder === 'asc' || sortOrder === 'ascending' ? 1 : -1;
     }
 
     const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
 
-    // Fetch contents with populated fields
-    const contents = await Content.find(whereConditions)
-        .populate({
-            path: "userId", // Populate userId field
-            select: "email role status", // Select necessary fields
-            // populate: [
-            //     {
-            //         path: "trainer", // Populate trainer if it exists
-            //         select: "firstName lastName specialism qualification onlineSession faceToFace consultationType",
-            //     },
-            //     {
-            //         path: "trainee", // Populate trainee if it exists
-            //         select: "firstName lastName fitterGoal interest towardsGoal achieveGoal",
-            //     },
-            // ],
-        })
-        .sort(sortConditions)
-        .skip(skip)
-        .limit(limit)
-        .lean(); // Use lean for plain JS objects (better performance)
+    const result = await Content.aggregate([
+        {
+            $match: whereConditions,
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "userDetails",
+            },
+        },
+        {
+            $unwind: {
+                path: "$userDetails",
+                preserveNullAndEmptyArrays: true, // Keep content even if no user found
+            },
+        },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "userDetails._id",
+                foreignField: "user",
+                as: "trainerDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "userDetails._id",
+                foreignField: "user",
+                as: "traineeDetails",
+            },
+        },
+        {
+            $match: role
+                ? { "userDetails.role": role }
+                : {},
+        },
+        {
+            $addFields: {
+                trainerDetails: {
+                    $cond: { if: { $ne: ["$trainerDetails", []] }, then: "$trainerDetails", else: "$$REMOVE" },
+                },
+                traineeDetails: {
+                    $cond: { if: { $ne: ["$traineeDetails", []] }, then: "$traineeDetails", else: "$$REMOVE" },
+                },
+            },
+        },
+        {
+            $project: {
+                title: 1,
+                content: 1,
+                specialism: 1,
+                status: 1,
+                imageUrl: 1,
+                userId: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "userDetails.email": 1,
+                "userDetails.role": 1,
+                "trainerDetails.firstName": 1,
+                "trainerDetails.lastName": 1,
+                "trainerDetails.gender": 1,
+                "trainerDetails.contactNo": 1,
+                "trainerDetails.profileImageUrl": 1,
+                "traineeDetails.firstName": 1,
+                "traineeDetails.lastName": 1,
+                "traineeDetails.gender": 1,
+                "traineeDetails.contactNo": 1,
+                "traineeDetails.profileImageUrl": 1,
+            },
+        },
+        { $sort: sortConditions },
+        { $skip: skip },
+        { $limit: limit },
+    ]);
 
-    // Count total documents
     const total = await Content.countDocuments(whereConditions);
 
     return {
@@ -100,9 +158,10 @@ const getAllContent = async (
             limit,
             total,
         },
-        data: contents,
+        data: result,
     };
 };
+
 
 export const contentServices = {
     createContent,

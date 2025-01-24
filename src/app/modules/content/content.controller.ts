@@ -76,7 +76,7 @@ const getMyContent = async (req: Request, res: Response, next: NextFunction) => 
 const getAllContent = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const { limit, page, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+        const { limit, page, sortBy, sortOrder, searchTerm, role, ...filters } = req.query;
 
         const paginationOptions = {
             limit: Number(limit) || 10,
@@ -86,7 +86,7 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
         };
         console.log(paginationOptions);
 
-        const result = await contentServices.getAllContent(paginationOptions,searchTerm, filters)
+        const result = await contentServices.getAllContent(paginationOptions,searchTerm,role, filters)
         res.status(200).json({
             success: true,
             message: 'get all content successfully',
