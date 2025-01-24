@@ -6,13 +6,51 @@ import { User } from '../users/user.model';
 import { ILoginUser } from './auth.interface';
 import bcrypt from 'bcrypt';
 import { sendEmail } from '../../utils/sendEmail';
+import { Admin } from '../admins/admin.model';
 
 const logInUser = async (logInData: ILoginUser): Promise<any> => {
-  console.log('before login', logInData);
   const isExist = await User.findOne({ email: logInData?.email })
-  console.log(isExist);
   if (!isExist) {
     throw new AppError(404, 'User not found!')
+  }
+
+  const matchedPassword = await bcrypt.compare(logInData?.password, isExist?.password);
+  if (!matchedPassword) {
+    throw new AppError(401, 'Password do not matched!');
+  }
+  if (isExist.status === 'blocked') {
+    throw new AppError(401, 'User is blocked!')
+  }
+
+  const tokenPayload = {
+    email: isExist.email,
+    id: isExist._id,
+    role: isExist.role,
+    status: isExist.status
+  }
+
+  const accessToken = createToken(
+    tokenPayload,
+    config.jwt_access_secret as Secret,
+    config.jwt_access_expires_in as string,
+  )
+  const refreshToken = createToken(
+    tokenPayload,
+    config.jwt_refresh_secret as Secret,
+    config.jwt_refresh_expires_in as string,
+  )
+
+  return {
+    refreshToken,
+    accessToken,
+  }
+
+}
+
+const logInAdmin = async (logInData: ILoginUser): Promise<any> => {
+  const isExist = await Admin.findOne({ email: logInData?.email })
+  if (!isExist) {
+    throw new AppError(404, 'May Be you are not admin!')
   }
 
   const matchedPassword = await bcrypt.compare(logInData?.password, isExist?.password);
@@ -224,6 +262,7 @@ const resetPassword = async (data: any): Promise<any> => {
 
 export const authServices = {
   logInUser,
+  logInAdmin,
   createRefreshToken,
   changePassword,
   forgetPassword,

@@ -9,7 +9,6 @@ const logInUser = async (req: Request, res: Response, next: NextFunction) => {
     const result = await authServices.logInUser(loginData)
 
     const { refreshToken, ...others } = result
-    console.log('refresh', refreshToken)
     const cookieOptions = {
       secure: config.node_env === 'production',
       httpOnly: true,
@@ -20,6 +19,30 @@ const logInUser = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
       success: true,
       message: 'User logIn successfully',
+      data: others,
+    })
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
+const logInAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const loginData = req.body;
+    const result = await authServices.logInAdmin(loginData)
+
+    const { refreshToken, ...others } = result
+    const cookieOptions = {
+      secure: config.node_env === 'production',
+      httpOnly: true,
+    }
+
+    res.cookie('refreshToken', refreshToken, cookieOptions)
+
+    res.status(200).json({
+      success: true,
+      message: 'Admin logIn successfully',
       data: others,
     })
   }
@@ -118,6 +141,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
 
 export const authController = {
   logInUser,
+  logInAdmin,
   createRefreshToken,
   changePassword,
   forgetPassword,
