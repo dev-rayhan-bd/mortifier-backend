@@ -203,9 +203,37 @@ const getAllContent = async (
 };
 
 
+
+const updateContent = async (file: any, content: IContent, user: any, id: string): Promise<IContent | null> => {
+
+    if (file) {
+        if (file.mimetype.startsWith("image/")) {
+            content.imageUrl = `/uploads/${file.filename}`;
+            content.userId = user?.id;
+        } else if (file.mimetype.startsWith("video/")) {
+            content.videoUrl = `/uploads/${file.filename}`;
+            content.userId = user?.id;
+        } else {
+            throw new Error("Invalid file type. Only images and videos are allowed.");
+        }
+    }
+    const result = await Content.findByIdAndUpdate(
+        {
+            _id: id
+        },
+        content,
+        {
+            new: true
+        }
+    )
+    return result
+}
+
+
 export const contentServices = {
     createContent,
     getSingleContent,
     getMyContent,
     getAllContent,
+    updateContent,
 }

@@ -112,9 +112,36 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const updateContent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const file = req.file
+        const id = req.params.id
+        const user = req.user
+        const data = JSON.parse(req.body.data? req.body.data : '{}')
+        const content = data
+
+        const result = await contentServices.updateContent(file, content, user, id)
+        res.status(200).json({
+            success: true,
+            message: 'content updated successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const contentController = {
     createContent,
     getSingleContent,
     getMyContent,
     getAllContent,
+    updateContent,
 }
