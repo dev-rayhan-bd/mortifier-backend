@@ -7,12 +7,17 @@ import { ITrainer } from '../trainer/trainer.interface';
 import { Trainer } from '../trainer/trainer.model';
 import mongoose from 'mongoose';
 
-const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeData: ITrainee): Promise<ITrainee | undefined> => {
+const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeData: ITrainee, file:any): Promise<ITrainee | undefined> => {
     const userData = {
         email: validateUserInfo?.email,
         password: validateUserInfo?.password,
         role: "trainee",
         status: 'in-progress',
+    }
+    
+    const userNameExist = await Trainee.findOne({ userName: validateTraineeData.userName })
+    if (userNameExist) {
+        throw new AppError(400, 'User Name already exists!')
     }
     const isExist = await User.findOne({ email: userData.email })
 
@@ -25,6 +30,7 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
 
     if (result?._id) {
         validateTraineeData.user = result?._id
+        validateTraineeData.profileImageUrl = `/uploads/${file.filename}`;
         const traineeResult = await Trainee.create(validateTraineeData)
         return traineeResult
     }
