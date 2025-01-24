@@ -18,6 +18,12 @@ const createContent = async (file: any, content: IContent, user: any): Promise<I
     const result = await Content.create(content)
     return result
 }
+
+const getSingleContent = async (id: string): Promise<IContent | null> => {
+    const result = await Content.findById({_id: id})
+    return result
+}
 export const contentServices = {
     createContent,
+    getSingleContent,
 }
