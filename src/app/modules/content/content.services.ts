@@ -23,7 +23,47 @@ const getSingleContent = async (id: string): Promise<IContent | null> => {
     const result = await Content.findById({_id: id})
     return result
 }
+
+const getMyContent = async (user: any,): Promise<IContent[] | null> => {
+    const result = await Content.find({userId: user?.id})
+    return result
+}
+
+const getAllContent = async (searchTerm: any): Promise<IContent[] | null> => {
+
+    const andConditions = [];
+  
+    const contentSearchableFields = ['title', 'content', 'specialism'];
+  
+    const contentFilterableFields = [
+    'specialism',
+    'user',
+   ]
+
+   if (searchTerm) {
+    andConditions.push({
+      $or: contentSearchableFields.map(field => ({
+        [field]: {
+          $regex: searchTerm,
+          $paginationOptions: 'i',
+        },
+      })),
+    });
+  }
+
+    const result = await Content.find({
+        $or: [
+            {title: {$regex: searchTerm, $options: 'i'}},
+            {content: {$regex: searchTerm, $options: 'i'}},
+            {specialism: {$regex: searchTerm, $options: 'i'}},
+        ]
+    })
+    return result
+}
+
 export const contentServices = {
     createContent,
     getSingleContent,
+    getMyContent,
+    getAllContent,
 }

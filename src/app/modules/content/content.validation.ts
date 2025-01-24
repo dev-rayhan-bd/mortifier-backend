@@ -12,10 +12,10 @@ export const contentValidatedSchema = z.object({
         invalid_type_error: "Content must be a string",
     }).min(1, "Content cannot be empty"),
 
-    specialism: z.array(z.string({
+    specialism: z.string(z.string({
         required_error: "Specialism is required",
         invalid_type_error: "Specialism must be a string",
-    })).nonempty("Specialism cannot be empty"),
+    })).min(1,"Specialism cannot be empty"),
 
     status: z.enum(["in-progress", "blocked"], {
         required_error: "Status is required",
