@@ -12,6 +12,11 @@ router.post('/login',
     authController.logInUser
 )
 
+router.post('/login-admin',
+    validateRequest(AuthValidation.loginValidationSchema),
+    authController.logInAdmin
+)
+
 router.post('/refresh-token',
     authController.createRefreshToken
 )

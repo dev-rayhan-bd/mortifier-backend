@@ -8,7 +8,7 @@ const traineeSchema: Schema<ITrainee> = new Schema({
         type: String,
         required: true
     },
-    gender: { type: String, enum: ['male', 'female', 'others'], required: true },
+    gender: { type: String, enum: ['male', 'female', 'others']},
     contactNo: { type: String, required: true },
     profileImageUrl: { type: String },
     title: { type: String, required: false },
@@ -19,7 +19,7 @@ const traineeSchema: Schema<ITrainee> = new Schema({
     height: { type: Number, required: true },
     weight: { type: Number, required: true },
     fitterGoal: { type: String, required: true },  // Enum can be added if predefined values are known
-    interest: { type: String, required: true },
+    interest: { type: [String], required: true },
     towardsGoal: { type: String, required: true },
     achieveGoal: { type: String, required: true },
     user: {

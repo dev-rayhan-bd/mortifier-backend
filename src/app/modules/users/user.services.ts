@@ -6,13 +6,21 @@ import { User } from "./user.model"
 import { ITrainer } from '../trainer/trainer.interface';
 import { Trainer } from '../trainer/trainer.model';
 import mongoose from 'mongoose';
+import { createToken } from '../../helpers/jwtHelper';
+import { Secret } from 'jsonwebtoken';
+import config from '../../config';
 
-const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeData: ITrainee): Promise<ITrainee | undefined> => {
+const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeData: ITrainee, file:any): Promise<any> => {
     const userData = {
         email: validateUserInfo?.email,
         password: validateUserInfo?.password,
         role: "trainee",
         status: 'in-progress',
+    }
+
+    const userNameExist = await Trainee.findOne({ userName: validateTraineeData.userName })
+    if (userNameExist) {
+        throw new AppError(400, 'User Name already exists!')
     }
     const isExist = await User.findOne({ email: userData.email })
 
@@ -25,12 +33,37 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
 
     if (result?._id) {
         validateTraineeData.user = result?._id
+        validateTraineeData.profileImageUrl = `/uploads/${file.filename}`;
         const traineeResult = await Trainee.create(validateTraineeData)
-        return traineeResult
+
+          const tokenPayload = {
+            email: result.email,
+            id: result._id,
+            role: result.role,
+            status: result.status
+          }
+        
+          const accessToken = createToken(
+            tokenPayload,
+            config.jwt_access_secret as Secret,
+            config.jwt_access_expires_in as string,
+          )
+          const refreshToken = createToken(
+            tokenPayload,
+            config.jwt_refresh_secret as Secret,
+            config.jwt_refresh_expires_in as string,
+          )
+        
+          return {
+            refreshToken,
+            accessToken,
+            userInfo: traineeResult,
+          }
+         
     }
 }
 
-const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerData: ITrainer): Promise<ITrainer | undefined> => {
+const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerData: ITrainer, file:any): Promise<any> => {
     const userData = {
         email: validateUserInfo?.email,
         password: validateUserInfo?.password,
@@ -48,8 +81,33 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
 
     if (result?._id) {
         validateTrainerData.user = result?._id
+        validateTrainerData.profileImageUrl = `/uploads/${file.filename}`;
         const trainerResult = await Trainer.create(validateTrainerData)
-        return trainerResult
+
+        const tokenPayload = {
+            email: result.email,
+            id: result._id,
+            role: result.role,
+            status: result.status
+          }
+        
+          const accessToken = createToken(
+            tokenPayload,
+            config.jwt_access_secret as Secret,
+            config.jwt_access_expires_in as string,
+          )
+          const refreshToken = createToken(
+            tokenPayload,
+            config.jwt_refresh_secret as Secret,
+            config.jwt_refresh_expires_in as string,
+          )
+        
+          return {
+            refreshToken,
+            accessToken,
+            userInfo: trainerResult,
+          }
+         
     }
 }
 

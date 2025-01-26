@@ -4,6 +4,7 @@ import { AuthRouter } from "../modules/auth/auth.route";
 import { AdminRouter } from "../modules/admins/admin.route";
 import { ChatsRouter } from "../modules/chats/chats.router";
 import { ContentRouter } from "../modules/content/content.route";
+import { SessionRouter } from "../modules/session/session.route";
 
 const router = Router();
 
@@ -23,6 +24,10 @@ const moduleRoutes = [
     {
         path: '/content',
         route: ContentRouter,
+    },
+    {
+        path: '/session',
+        route: SessionRouter,
     },
     {
         path: '/chats',

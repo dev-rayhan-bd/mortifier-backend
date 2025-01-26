@@ -21,7 +21,7 @@ export const traineeValidatedSchema = z.object({
     gender: z.enum(['male', 'female', 'others'], {
         required_error: "Gender is required",
         invalid_type_error: "Gender must be 'male', 'female', or 'others'",
-    }),
+    }).optional(),
 
     contactNo: z.string({
         required_error: "Contact number is required",
@@ -70,9 +70,13 @@ export const traineeValidatedSchema = z.object({
         invalid_type_error: "Fitter goal must be a string",
     }).min(1, "Fitter goal cannot be empty"),
 
-    interest: z.string({
+    interest: z.array(z.string({
+        required_error: "Each interest must be a string",
         invalid_type_error: "Interest must be a string",
-    }),
+    }), {
+        required_error: "Interest is required",
+        invalid_type_error: "Interest must be an array of strings",
+    }).min(1, "At least one interest is required"),
 
     towardsGoal: z.string({
         invalid_type_error: "Towards goal must be a string",
