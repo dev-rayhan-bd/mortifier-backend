@@ -40,6 +40,32 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const updateSession = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const file = req.file
+        const user = req.user
+        const id = req.params.id
+        const content = JSON.parse(req.body.data)
+
+        const result = await sessionServices.updateSession(id,file, user, content)
+        res.status(200).json({
+            success: true,
+            message: 'session updated successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const sessionController = {
     createSession,
+    updateSession,
 }

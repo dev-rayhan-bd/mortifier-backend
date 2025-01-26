@@ -10,10 +10,10 @@ const VideoSchema = z.object({
         required_error: "Video URL is required",
         invalid_type_error: "Video URL must be a string",
     }).url("Video URL must be a valid URL"),
-    duration: z.number({
+    duration: z.string({
         required_error: "Video duration is required",
-        invalid_type_error: "Video duration must be a number",
-    }).min(1, "Video duration must be greater than 0"),
+        invalid_type_error: "Video duration must be a string",
+    }),
 });
 
 export const trainingSessionValidatedSchema = z.object({

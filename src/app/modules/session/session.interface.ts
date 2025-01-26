@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 interface Video {
     title: string;
     url: string;
-    duration: number;
+    duration: string;
 }
 
 export interface ITrainingSession {

@@ -4,7 +4,7 @@ import { ITrainingSession } from "./session.interface";
 const videoSchema: Schema = new Schema({
     title: { type: String, required: true },
     url: { type: String, required: true },
-    duration: { type: Number, required: true },
+    duration: { type: String, required: true },
 });
 
 
