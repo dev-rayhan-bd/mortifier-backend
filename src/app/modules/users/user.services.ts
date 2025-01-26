@@ -57,7 +57,7 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
           return {
             refreshToken,
             accessToken,
-            traineeResult,
+            userInfo: traineeResult,
           }
          
     }
@@ -105,7 +105,7 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
           return {
             refreshToken,
             accessToken,
-            trainerResult,
+            userInfo: trainerResult,
           }
          
     }
