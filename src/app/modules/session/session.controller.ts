@@ -28,12 +28,6 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
             message: 'session created successfully',
             data: result,
         })
-        // sendResponse(res, {
-        //     statusCode: httpStatus.OK,
-        //     success: true,
-        //     message: 'user created successfully',
-        //     data: result,
-        // });
     }
     catch (error) {
         next(error)
@@ -53,12 +47,6 @@ const updateSession = async (req: Request, res: Response, next: NextFunction) =>
             message: 'session updated successfully',
             data: result,
         })
-        // sendResponse(res, {
-        //     statusCode: httpStatus.OK,
-        //     success: true,
-        //     message: 'user created successfully',
-        //     data: result,
-        // });
     }
     catch (error) {
         next(error)

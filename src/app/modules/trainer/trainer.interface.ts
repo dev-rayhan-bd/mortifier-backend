@@ -16,5 +16,6 @@ export interface ITrainer {
   consultationType: 'paid' | 'free';
   specialism: string[];  // Array of strings
   qualification?: string;
+  radius?: string;
   user?: Types.ObjectId;
 }

@@ -70,6 +70,10 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
         role: "trainer",
         status: 'in-progress',
     }
+    const userNameExist = await Trainer.findOne({ userName: validateTrainerData.userName })
+    if (userNameExist) {
+        throw new AppError(400, 'User Name already exists!')
+    }
     const isExist = await User.findOne({ email: userData.email })
 
     if (isExist) {
