@@ -74,6 +74,11 @@ export const trainerValidatedSchema = z.object({
         invalid_type_error: "Qualification must be a string",
     }).optional(),
 
+    radius: z.string({
+        required_error: "Radius is required",
+        invalid_type_error: "Radius must be a string",
+    }).optional(),
+
     user: z.custom<Types.ObjectId>((val) => Types.ObjectId.isValid(val), {
         message: 'Invalid user ID',
     }).optional(),

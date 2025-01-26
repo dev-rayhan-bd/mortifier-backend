@@ -64,6 +64,9 @@ const trainerSchema = new Schema<ITrainer>(
     qualification: {
       type: String,
     },
+    radius: {
+      type: String,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
