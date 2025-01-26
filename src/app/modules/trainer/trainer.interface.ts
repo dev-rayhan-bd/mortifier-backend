@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 export interface ITrainer {
   firstName: string;
   lastName: string;
-  gender: 'male' | 'female' | 'others';
+  gender?: 'male' | 'female' | 'others';
   contactNo: string;
   profileImageUrl?: string;
   dob: Date;
@@ -15,6 +15,6 @@ export interface ITrainer {
   faceToFace: 'yes' | 'no';
   consultationType: 'paid' | 'free';
   specialism: string[];  // Array of strings
-  qualification: string;
+  qualification?: string;
   user?: Types.ObjectId;
 }

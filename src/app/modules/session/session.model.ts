@@ -12,7 +12,7 @@ const trainingSessionSchema: Schema<ITrainingSession> = new Schema({
     trainer_id: { type: Types.ObjectId, ref: "Trainer"},
     sessionType: { type: String, enum: ["live", "recorded"], required: true },
     sessionMode: { type: String, enum: ["group", "1on1"], required: true },
-    fitnessFocus: { type: Number, required: true },
+    fitnessFocus: { type: [String], required: true },
     otherFocus: { type: String, required: true },
     recordedContent: { type: [videoSchema] }, 
     accessType: { type: String, enum: ["free", "membership", "followers"], required: true },

@@ -1,6 +1,5 @@
 import { Types } from "mongoose";
 
-
 interface Video {
     title: string;
     url: string;
@@ -11,7 +10,7 @@ export interface ITrainingSession {
     trainer_id?: Types.ObjectId;
     sessionType: "live" | "recorded";
     sessionMode: "group" | "1on1";
-    fitnessFocus: number;
+    fitnessFocus: string[];
     otherFocus: string;
     recordedContent?: Video[];
     accessType: "free" | "membership" | "followers";

@@ -15,7 +15,7 @@ export const trainerValidatedSchema = z.object({
     gender: z.enum(['male', 'female', 'others'], {
         required_error: "Gender is required",
         invalid_type_error: "Gender must be 'male', 'female', or 'others'",
-    }),
+    }).optional(),
 
     contactNo: z.string({
         required_error: "Contact number is required",
@@ -72,7 +72,7 @@ export const trainerValidatedSchema = z.object({
     qualification: z.string({
         required_error: "Qualification is required",
         invalid_type_error: "Qualification must be a string",
-    }).min(1, "Qualification cannot be empty"),
+    }).optional(),
 
     user: z.custom<Types.ObjectId>((val) => Types.ObjectId.isValid(val), {
         message: 'Invalid user ID',
