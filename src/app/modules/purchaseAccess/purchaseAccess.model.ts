@@ -1,0 +1,20 @@
+import { Schema, model, Types } from "mongoose";
+import { IPurchaseAccess } from "./purchaseAccess.interface";
+
+const purchaseAccessSchema: Schema<IPurchaseAccess> = new Schema({
+    session_id: { type: Types.ObjectId, ref: "TrainingSession"},
+    user_id: { type: Types.ObjectId, ref: "User"},
+    purchaseDate: { type: Date, default: Date.now, required: true },
+    paymentStatus: {
+        type: String,
+        enum: ["pending", "paid", "failed"],
+        required: true,
+        default: "pending",
+    },
+    paymentDetails: {
+        transactionId: { type: String, required: false },
+        amountPaid: { type: Number, required: false },
+    },
+}, { timestamps: true });
+
+export const PurchaseAccess = model<IPurchaseAccess>("PurchaseAccess", purchaseAccessSchema);

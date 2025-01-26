@@ -1,0 +1,22 @@
+import { Types } from "mongoose";
+
+
+interface Video {
+    title: string;
+    url: string;
+    duration: number;
+}
+
+export interface ITrainingSession {
+    trainer_id?: Types.ObjectId;
+    sessionType: "live" | "recorded";
+    sessionMode: "group" | "1on1";
+    fitnessFocus: number;
+    otherFocus: string;
+    recordedContent?: Video[];
+    accessType: "free" | "membership" | "followers";
+    frequency: "weekly" | "monthly";
+    membership_fee: number;
+    promo_image?: string;
+    promo_video?: string;
+}
