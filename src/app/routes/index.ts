@@ -7,6 +7,7 @@ import { ContentRouter } from "../modules/content/content.route";
 import { SessionRouter } from "../modules/session/session.route";
 import { TrainerRouter } from "../modules/trainer/trainer.route";
 import { SpecialismRouter } from "../modules/specialism/specialism.route";
+import { QualificationRouter } from "../modules/qualification/qualification.route";
 
 const router = Router();
 
@@ -30,6 +31,10 @@ const moduleRoutes = [
     {
         path: '/specialism',
         route: SpecialismRouter,
+    },
+    {
+        path: '/qualification',
+        route: QualificationRouter,
     },
     {
         path: '/content',
