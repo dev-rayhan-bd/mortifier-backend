@@ -69,16 +69,37 @@ export const trainerValidatedSchema = z.object({
 
     specialism: z.array(z.string()).min(1, "At least one specialism is required"),
 
-    qualification: z.string({
-        required_error: "Qualification is required",
-        invalid_type_error: "Qualification must be a string",
-    }).optional(),
+    qualification: z
+        .array(z.string(), {
+            required_error: "Qualification is required",
+            invalid_type_error: "Qualification must be a string",
+        })
+        .optional(),
 
     radius: z.string({
         required_error: "Radius is required",
         invalid_type_error: "Radius must be a string",
     }).optional(),
-
+    TikTok: z
+        .string()
+        .url("TikTok must be a valid URL")
+        .optional(),
+    Instagram: z
+        .string()
+        .url("Instagram must be a valid URL")
+        .optional(),
+    Facebook: z
+        .string()
+        .url("Facebook must be a valid URL")
+        .optional(),
+    Youtube: z
+        .string()
+        .url("Youtube must be a valid URL")
+        .optional(),
+    Twitter: z
+        .string()
+        .url("Twitter must be a valid URL")
+        .optional(),
     user: z.custom<Types.ObjectId>((val) => Types.ObjectId.isValid(val), {
         message: 'Invalid user ID',
     }).optional(),
