@@ -12,7 +12,31 @@ const createSpecialism = async (req: Request, res: Response, next: NextFunction)
 
         res.status(200).json({
             success: true,
-            message: 'trainer updated successfully',
+            message: 'specialism updated successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+
+const getAllOfUserSpecialism = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+
+        const result = await specialismServices.getAllOfUserSpecialism(id);
+
+        res.status(200).json({
+            success: true,
+            message: 'get all specialism successfully',
             data: result,
         })
         // sendResponse(res, {
@@ -29,4 +53,5 @@ const createSpecialism = async (req: Request, res: Response, next: NextFunction)
 
 export const specialismController = {
     createSpecialism,
+    getAllOfUserSpecialism,
 }

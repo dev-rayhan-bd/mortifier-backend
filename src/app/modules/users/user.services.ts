@@ -94,7 +94,7 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
 
         if (trainerResult?._id) {
             for (const spec of specialism) {
-                await Specialism.create({ specialism: spec, trainerId: trainerResult._id });
+                await Specialism.create({ specialism: spec, trainer_id: trainerResult._id });
             }
         }
 

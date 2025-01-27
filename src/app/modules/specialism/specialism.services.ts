@@ -12,6 +12,12 @@ const createSpecialism = async (id: string, data: Partial<ISpecialism>): Promise
     return result
 }
 
+const getAllOfUserSpecialism = async (id: string): Promise<ISpecialism[] | null> => {
+    const result = await Specialism.find({ trainer_id: id });
+    return result;
+}
+
 export const specialismServices = {
     createSpecialism,
+    getAllOfUserSpecialism,
 }
