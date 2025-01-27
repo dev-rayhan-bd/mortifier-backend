@@ -36,7 +36,7 @@ const getAllOfUserSpecialism = async (req: Request, res: Response, next: NextFun
 
         res.status(200).json({
             success: true,
-            message: 'get all specialism successfully',
+            message: 'get all specialism of a trainer successfully',
             data: result,
         })
         // sendResponse(res, {
