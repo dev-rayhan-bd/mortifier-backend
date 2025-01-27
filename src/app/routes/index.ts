@@ -6,6 +6,7 @@ import { ChatsRouter } from "../modules/chats/chats.router";
 import { ContentRouter } from "../modules/content/content.route";
 import { SessionRouter } from "../modules/session/session.route";
 import { TrainerRouter } from "../modules/trainer/trainer.route";
+import { SpecialismRouter } from "../modules/specialism/specialism.route";
 
 const router = Router();
 
@@ -25,6 +26,10 @@ const moduleRoutes = [
     {
         path: '/trainer',
         route: TrainerRouter,
+    },
+    {
+        path: '/specialism',
+        route: SpecialismRouter,
     },
     {
         path: '/content',
