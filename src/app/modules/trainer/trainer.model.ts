@@ -62,11 +62,16 @@ const trainerSchema = new Schema<ITrainer>(
       required: true,
     },
     qualification: {
-      type: String,
+      type: [String],
     },
     radius: {
       type: String,
     },
+    TikTok: { type: String },
+    Instagram: { type: String },
+    Facebook: { type: String },
+    Youtube: { type: String },
+    Twitter: { type: String },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

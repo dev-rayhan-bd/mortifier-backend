@@ -15,7 +15,12 @@ export interface ITrainer {
   faceToFace: 'yes' | 'no';
   consultationType: 'paid' | 'free';
   specialism: string[];  // Array of strings
-  qualification?: string;
+  qualification?: string[];
   radius?: string;
+  TikTok?: string;
+  Instagram?: string;
+  Facebook?: string;
+  Youtube?: string;
+  Twitter?: string;
   user?: Types.ObjectId;
 }

@@ -5,6 +5,7 @@ import { AdminRouter } from "../modules/admins/admin.route";
 import { ChatsRouter } from "../modules/chats/chats.router";
 import { ContentRouter } from "../modules/content/content.route";
 import { SessionRouter } from "../modules/session/session.route";
+import { TrainerRouter } from "../modules/trainer/trainer.route";
 
 const router = Router();
 
@@ -20,6 +21,10 @@ const moduleRoutes = [
     {
         path: '/admin',
         route: AdminRouter,
+    },
+    {
+        path: '/trainer',
+        route: TrainerRouter,
     },
     {
         path: '/content',
