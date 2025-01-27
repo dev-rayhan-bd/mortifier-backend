@@ -8,6 +8,7 @@ import { SessionRouter } from "../modules/session/session.route";
 import { TrainerRouter } from "../modules/trainer/trainer.route";
 import { SpecialismRouter } from "../modules/specialism/specialism.route";
 import { QualificationRouter } from "../modules/qualification/qualification.route";
+import { TraineeRouter } from "../modules/trainee/trainee.route";
 
 const router = Router();
 
@@ -27,6 +28,10 @@ const moduleRoutes = [
     {
         path: '/trainer',
         route: TrainerRouter,
+    },
+    {
+        path: '/trainee',
+        route: TraineeRouter,
     },
     {
         path: '/specialism',
