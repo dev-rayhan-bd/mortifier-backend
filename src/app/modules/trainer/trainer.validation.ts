@@ -67,8 +67,6 @@ export const trainerValidatedSchema = z.object({
         invalid_type_error: "Consultation type must be 'paid' or 'free'",
     }),
 
-    specialism: z.array(z.string()).min(1, "At least one specialism is required"),
-
     qualification: z
         .array(z.string(), {
             required_error: "Qualification is required",

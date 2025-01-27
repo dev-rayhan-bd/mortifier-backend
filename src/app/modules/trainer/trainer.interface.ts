@@ -14,7 +14,6 @@ export interface ITrainer {
   onlineSession: 'yes' | 'no';
   faceToFace: 'yes' | 'no';
   consultationType: 'paid' | 'free';
-  specialism: string[];  // Array of strings
   qualification?: string[];
   radius?: string;
   TikTok?: string;

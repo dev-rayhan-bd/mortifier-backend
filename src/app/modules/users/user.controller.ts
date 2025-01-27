@@ -43,11 +43,12 @@ const createTrainer = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const file = req.file
         const data = JSON.parse(req.body.data)
-        const { userInfo, trainerData } = data;
+        const specialism = data.specialism
+        const { userInfo, trainerData } = data.register;
 
         const validateUserInfo = userValidationSchema.parse(userInfo)
         const validateTrainerData = trainerValidatedSchema.parse(trainerData)
-        const result = await userServices.createTrainer(validateUserInfo, validateTrainerData, file);
+        const result = await userServices.createTrainer(validateUserInfo, validateTrainerData, file, specialism);
         const { refreshToken, ...others } = result
         const cookieOptions = {
             secure: config.node_env === 'production',
