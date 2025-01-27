@@ -57,10 +57,6 @@ const trainerSchema = new Schema<ITrainer>(
       enum: ['paid', 'free'],
       required: true,
     },
-    specialism: {
-      type: [String],
-      required: true,
-    },
     qualification: {
       type: [String],
     },
