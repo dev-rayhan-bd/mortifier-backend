@@ -9,6 +9,7 @@ import { TrainerRouter } from "../modules/trainer/trainer.route";
 import { SpecialismRouter } from "../modules/specialism/specialism.route";
 import { QualificationRouter } from "../modules/qualification/qualification.route";
 import { TraineeRouter } from "../modules/trainee/trainee.route";
+import { InvitationRouter } from "../modules/invitation/invitation.route";
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const moduleRoutes = [
     {
         path: '/trainee',
         route: TraineeRouter,
+    },
+    {
+        path: '/invitation',
+        route: InvitationRouter,
     },
     {
         path: '/specialism',
