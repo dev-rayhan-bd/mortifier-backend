@@ -6,6 +6,7 @@ import { ENUM_USER_ROLE } from "../../enums/user";
 const router = Router();
 
 router.post('/sent-invitation', auth(ENUM_USER_ROLE.TRAINER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), invitationController.sentInvitation)
+router.get('/get-trainee/:id', auth(ENUM_USER_ROLE.TRAINER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), invitationController.getAllTrainee)
 
 // router.get('/:id', )
 

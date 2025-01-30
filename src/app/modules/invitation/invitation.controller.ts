@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { invitationServices } from './invitation.services';
+import { IPaginationOptions } from '../../global/globalType';
 
 const sentInvitation = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -23,6 +24,40 @@ const sentInvitation = async (req: Request, res: Response, next: NextFunction) =
     }
 }
 
+const getAllTrainee = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { limit, page, sortBy, sortOrder, searchTerm } = req.query;
+        const trainer_id = req.params.id
+        console.log(trainer_id);
+
+        const paginationOptions: IPaginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
+        };
+
+        const result = await invitationServices.getAllTrainee(paginationOptions, searchTerm, trainer_id);
+
+        res.status(200).json({
+            success: true,
+            message: 'get trainee successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+
 export const invitationController = {
     sentInvitation,
+    getAllTrainee,
 }
