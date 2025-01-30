@@ -153,13 +153,12 @@ const getAllContent = async (
         },
         {
             $addFields: {
-                trainerDetails: {
-                    $cond: { if: { $ne: ["$trainerDetails", []] }, then: "$trainerDetails", else: "$$REMOVE" },
-                },
-                traineeDetails: {
-                    $cond: { if: { $ne: ["$traineeDetails", []] }, then: "$traineeDetails", else: "$$REMOVE" },
-                },
-            },
+                userInfo: {
+                    $arrayElemAt: [
+                        { $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0
+                    ]
+                }
+            }
         },
         {
             $project: {
@@ -173,18 +172,13 @@ const getAllContent = async (
                 updatedAt: 1,
                 "userDetails.email": 1,
                 "userDetails.role": 1,
-                "trainerDetails.firstName": 1,
-                "trainerDetails.lastName": 1,
-                "trainerDetails.gender": 1,
-                "trainerDetails.contactNo": 1,
-                "trainerDetails.profileImageUrl": 1,
-                "traineeDetails.firstName": 1,
-                "traineeDetails.lastName": 1,
-                "traineeDetails.gender": 1,
-                "traineeDetails.contactNo": 1,
-                "traineeDetails.profileImageUrl": 1,
-            },
+                "userInfo.firstName": 1,
+                "userInfo.lastName": 1,
+                "userInfo.profileImageUrl": 1
+            }
         },
+        
+        
         { $sort: sortConditions },
         { $skip: skip },
         { $limit: limit },
