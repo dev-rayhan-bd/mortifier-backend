@@ -39,14 +39,9 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
 
     const getAllInvitations = await Invitation.find({ trainer_id: trainer_id });
 
-    console.log('sdfsadfasf', getAllInvitations);
-
     const invitedTraineeIds = getAllInvitations.map(invitation => invitation.trainee_id);
     
-    console.log(invitedTraineeIds);
-
     const andConditions = [];
-
 
     const contentSearchableFields = ["firstName", "lastName", "email"];
 
@@ -92,8 +87,30 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
 
 }
 
+const getMyInvitation = async (trainee_id: string): Promise<IInvitation[]> => {
+
+    const isTraineeExist = await Trainee.findById({ _id: trainee_id })
+    if (!isTraineeExist) {
+        throw new AppError(404, 'trainee does not exist!')
+    }
+
+    const getAllInvitations = await Invitation.find({
+        trainee_id: trainee_id,
+    });
+    
+    return getAllInvitations;
+}
+
+const rejectInvitation = async (id: string): Promise<IInvitation | null> => {
+
+    const result = Invitation.findByIdAndDelete({_id: id})
+    
+    return result;
+}
 
 export const invitationServices = {
     sentInvitation,
     getAllTrainee,
+    getMyInvitation,
+    rejectInvitation,
 }

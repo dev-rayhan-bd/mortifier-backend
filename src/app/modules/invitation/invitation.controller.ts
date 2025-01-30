@@ -56,8 +56,54 @@ const getAllTrainee = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getMyInvitation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const trainee_id = req.params.id
+        const result = await invitationServices.getMyInvitation(trainee_id)
+
+        res.status(200).json({
+            success: true,
+            message: 'get my invitation successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const rejectInvitation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await invitationServices.rejectInvitation(id)
+
+        res.status(200).json({
+            success: true,
+            message: 'reject invitation successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 
 export const invitationController = {
     sentInvitation,
     getAllTrainee,
+    getMyInvitation,
+    rejectInvitation,
 }
