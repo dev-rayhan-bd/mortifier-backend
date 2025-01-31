@@ -72,7 +72,6 @@ const getMyContent = async (
     };
 };
 
-
 const getAllContent = async (
     paginationOptions: any,
     searchTerm: any,
@@ -82,7 +81,6 @@ const getAllContent = async (
     const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
 
     const andConditions = [];
-
 
     const contentSearchableFields = ["title", "content", "specialism"];
 
@@ -112,7 +110,7 @@ const getAllContent = async (
 
     const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
 
-    const result = await Content.aggregate([
+    const aggregationPipeline = [
         {
             $match: whereConditions,
         },
@@ -177,14 +175,23 @@ const getAllContent = async (
                 "userInfo.profileImageUrl": 1
             }
         },
-        
-        
         { $sort: sortConditions },
+    ];
+
+    // Get the total count after all filtering and transformations
+    const totalResult = await Content.aggregate([
+        ...aggregationPipeline,
+        { $count: "total" }
+    ]);
+
+    const total = totalResult.length > 0 ? totalResult[0].total : 0;
+
+    // Apply pagination
+    const result = await Content.aggregate([
+        ...aggregationPipeline,
         { $skip: skip },
         { $limit: limit },
     ]);
-
-    const total = await Content.countDocuments(whereConditions);
 
     return {
         meta: {
