@@ -16,10 +16,10 @@ const logInUser = async (logInData: ILoginUser): Promise<any> => {
 
   const matchedPassword = await bcrypt.compare(logInData?.password, isExist?.password);
   if (!matchedPassword) {
-    throw new AppError(401, 'Password do not matched!');
+    throw new AppError(400, 'Password did not matched!');
   }
   if (isExist.status === 'blocked') {
-    throw new AppError(401, 'User is blocked!')
+    throw new AppError(400, 'User is blocked!')
   }
 
   const tokenPayload = {
@@ -55,10 +55,10 @@ const logInAdmin = async (logInData: ILoginUser): Promise<any> => {
 
   const matchedPassword = await bcrypt.compare(logInData?.password, isExist?.password);
   if (!matchedPassword) {
-    throw new AppError(401, 'Password do not matched!');
+    throw new AppError(400, 'Password did not matched!');
   }
   if (isExist.status === 'blocked') {
-    throw new AppError(401, 'User is blocked!')
+    throw new AppError(400, 'User is blocked!')
   }
 
   const tokenPayload = {
@@ -137,12 +137,12 @@ const changePassword = async (user: any, data: { oldPassword: string, newPasswor
     throw new AppError(404, 'User not found!')
   }
   if (isExist.status === 'blocked') {
-    throw new AppError(401, 'User is blocked!')
+    throw new AppError(400, 'User is blocked!')
   }
 
   const matchedPassword = await bcrypt.compare(data?.oldPassword, isExist?.password);
   if (!matchedPassword) {
-    throw new AppError(401, 'Password do not matched!');
+    throw new AppError(400, 'Password do not matched!');
   }
   const hashedNewPassword = await bcrypt.hash(data.newPassword, Number(config.bcrypt_salt_rounds))
   const result = await User.findOneAndUpdate(
@@ -166,7 +166,7 @@ const forgetPassword = async (email: any): Promise<any> => {
     throw new AppError(404, 'User not found!')
   }
   if (isExist.status === 'blocked') {
-    throw new AppError(401, 'User is blocked!')
+    throw new AppError(403, 'User is blocked!')
   }
   // Generate a 5-digit reset token (verification code)
   const resetToken = Math.floor(10000 + Math.random() * 90000).toString(); // 5-digit random number
