@@ -4,6 +4,7 @@ import { IContent } from "./content.interface";
 import { Content } from "./content.model";
 import { Trainer } from "../trainer/trainer.model";
 import { Trainee } from "../trainee/trainee.model";
+import AppError from "../../errors/AppError";
 
 
 const createContent = async (file: any, content: IContent, user: any): Promise<IContent> => {
@@ -231,10 +232,30 @@ const updateContent = async (file: any, content: IContent, user: any, id: string
 }
 
 
+const deleteContent = async (id: string, user: any): Promise<IContent | null> => {
+
+    const content = await Content.findById(id);
+
+    if (!content) {
+        throw new Error("Content not found");
+    }
+
+    if (!content.userId) {
+        throw new AppError(400,"Content userId is missing");
+    }
+    if (content?.userId.toString() as string !== user.id.toString()) {
+        throw new AppError(403, "Unauthorized: You can't delete others' content");
+    }
+    const result = Content.findByIdAndDelete({ _id: id })
+
+    return result;
+}
+
 export const contentServices = {
     createContent,
     getSingleContent,
     getMyContent,
     getAllContent,
     updateContent,
+    deleteContent,
 }
