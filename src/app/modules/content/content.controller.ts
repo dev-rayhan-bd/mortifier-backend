@@ -138,10 +138,35 @@ const updateContent = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const deleteContent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const user = req.user
+
+
+        const result = await contentServices.deleteContent(id, user)
+        res.status(200).json({
+            success: true,
+            message: 'content deleted successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const contentController = {
     createContent,
     getSingleContent,
     getMyContent,
     getAllContent,
     updateContent,
+    deleteContent,
 }
