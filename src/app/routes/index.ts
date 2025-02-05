@@ -12,6 +12,7 @@ import { TraineeRouter } from "../modules/trainee/trainee.route";
 import { InvitationRouter } from "../modules/invitation/invitation.route";
 import { reviewRouter } from "../modules/review/review.route";
 import { followAndUnfollowRouter } from "../modules/follower/follower.route";
+import { LikesRouter } from "../modules/likes/likes.route";
 
 const router = Router();
 
@@ -59,6 +60,10 @@ const moduleRoutes = [
     {
         path: '/content',
         route: ContentRouter,
+    },
+    {
+        path: '/like',
+        route: LikesRouter,
     },
     {
         path: '/session',
