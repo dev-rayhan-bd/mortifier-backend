@@ -85,6 +85,26 @@ export const traineeValidatedSchema = z.object({
     achieveGoal: z.string({
         invalid_type_error: "Achieve goal must be a string",
     }),
+    TikTok: z
+        .string()
+        .url("TikTok must be a valid URL")
+        .optional(),
+    Instagram: z
+        .string()
+        .url("Instagram must be a valid URL")
+        .optional(),
+    Facebook: z
+        .string()
+        .url("Facebook must be a valid URL")
+        .optional(),
+    Youtube: z
+        .string()
+        .url("Youtube must be a valid URL")
+        .optional(),
+    Twitter: z
+        .string()
+        .url("Twitter must be a valid URL")
+        .optional(),
     user: z.custom<Types.ObjectId>((val) => Types.ObjectId.isValid(val), {
         message: 'Invalid user ID',
     }).optional(),

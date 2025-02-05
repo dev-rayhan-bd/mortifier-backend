@@ -32,7 +32,34 @@ const getAllTrainee = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const updateTrainee = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const file = req?.file
+        const id = req.params.id
+        // const user = req.user
+        const data = JSON.parse(req.body.data)
+
+        const result = await traineeServices.updateTrainee(file, id, data);
+
+        res.status(200).json({
+            success: true,
+            message: 'trainee updated successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const traineeController = {
     getAllTrainee,
+    updateTrainee,
 }
 

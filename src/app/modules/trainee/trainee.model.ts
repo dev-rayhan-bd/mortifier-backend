@@ -22,6 +22,11 @@ const traineeSchema: Schema<ITrainee> = new Schema({
     interest: { type: [String], required: true },
     towardsGoal: { type: String, required: true },
     achieveGoal: { type: String, required: true },
+    TikTok: { type: String },
+    Instagram: { type: String },
+    Facebook: { type: String },
+    Youtube: { type: String },
+    Twitter: { type: String },
     user: {
         type: Schema.Types.ObjectId,
         required: [true, 'User id is required'],

@@ -18,5 +18,10 @@ export type ITrainee = {
     interest: string[];
     towardsGoal: string;
     achieveGoal: string;
+    TikTok?: string;
+    Instagram?: string;
+    Facebook?: string;
+    Youtube?: string;
+    Twitter?: string;
     user?: Types.ObjectId;
 }

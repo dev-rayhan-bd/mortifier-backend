@@ -48,6 +48,25 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
 
 }
 
+const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>) => {
+    if (file) {
+        data.profileImageUrl = `/uploads/${file.filename}`;
+    }
+
+    const result = await Trainee.findByIdAndUpdate(
+        {
+            _id: id
+        },
+        data,
+        {
+            new: true
+        }
+    )
+    return result
+
+}
+
 export const traineeServices = {
     getAllTrainee,
+    updateTrainee,
 }
