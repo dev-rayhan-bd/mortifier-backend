@@ -26,9 +26,8 @@ const followAndUnfollow = async (req: Request, res: Response, next: NextFunction
 
 const getMyfollower = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = req.user
-
-        const result = await followAndUnfollowServices.getMyfollower(user)
+        const id = req.params.id
+        const result = await followAndUnfollowServices.getMyfollower(id)
 
         res.status(200).json({
             success: true,

@@ -180,9 +180,77 @@ const getMe = async (user: any) => {
 //     return result
 // }
 
+const viewUser = async (id: any, loggedInUserId: any) => {
+    const userId = new mongoose.Types.ObjectId(id);
+    const loggedInId = new mongoose.Types.ObjectId(loggedInUserId.id);
+
+    const result = await User.aggregate([
+        {
+            $match: { _id: userId },
+        },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "_id",
+                foreignField: "user",
+                as: "trainerDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "_id",
+                foreignField: "user",
+                as: "traineeDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "followers",
+                let: { viewedUserId: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$follower_id", loggedInId] },
+                                    { $eq: ["$following_id", "$$viewedUserId"] },
+                                ],
+                            },
+                        },
+                    },
+                ],
+                as: "followStatus",
+            },
+        },
+        {
+            $addFields: {
+                userInfo: {
+                    $arrayElemAt: [
+                        { $concatArrays: ["$trainerDetails", "$traineeDetails"] },
+                        0,
+                    ],
+                },
+                isFollowing: { $gt: [{ $size: "$followStatus" }, 0] }, // Check if following exists
+            },
+        },
+        {
+            $project: {
+                _id: 0, // Excludes _id
+                userInfo: 1,
+                isFollowing: 1, // Include the isFollowing status
+            },
+        },
+    ]);
+
+    return result[0]
+};
+
+
 export const userServices = {
     createTrainee,
     createTrainer,
     getMe,
+    viewUser,
     // getMeTrainee,
 }

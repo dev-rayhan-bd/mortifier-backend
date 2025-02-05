@@ -1,10 +1,14 @@
 import { Router } from "express";
 import auth from "../../middlewares/auth";
 import { traineeController } from "./trainee.controller";
+import { upload } from "../../helpers/fileUploader";
+import { ENUM_USER_ROLE } from "../../enums/user";
 
 const router = Router();
 
 router.get('/', auth(), traineeController.getAllTrainee)
+router.patch('/:id',
+    upload.single('file'), auth(ENUM_USER_ROLE.TRAINEE, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN), traineeController.updateTrainee)
 
 
 export const TraineeRouter = router;

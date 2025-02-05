@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { IFollower } from "./follower.interface"
 import { Follower } from "./follower.model";
 
@@ -30,40 +31,63 @@ const followAndUnfollow = async (data: IFollower) => {
     }
 }
 
-const getMyfollower = async (user: any) => {
-    const followers = await Follower.find({ following_id: user.id })
-        .populate({
-            path: "follower_id",
-            select: "profileImageUrl firstName lastName", // Select only the required fields
-            populate: [
-                {
-                    path: "trainerDetails", // Populate trainer details if the user is a trainer
-                    select: "profileImageUrl firstName lastName",
-                },
-                {
-                    path: "traineeDetails", // Populate trainee details if the user is a trainee
-                    select: "profileImageUrl firstName lastName",
-                },
-            ],
-        });
+const getMyfollower = async (id: any) => {
 
-    // Format the response to include profileImageUrl and name
-    // const formattedFollowers = followers.map((follower) => {
-    //     const user = follower.follower_id;
-    //     const profileImageUrl = user.trainerDetails?.profileImageUrl || user.traineeDetails?.profileImageUrl;
-    //     const name = user.trainerDetails
-    //         ? `${user.trainerDetails.firstName} ${user.trainerDetails.lastName}`
-    //         : `${user.traineeDetails.firstName} ${user.traineeDetails.lastName}`;
+    const objectId = new mongoose.Types.ObjectId(id);
 
-    //     return {
-    //         _id: user._id,
-    //         profileImageUrl,
-    //         name,
-    //     };
-    // });
+    const followers = await Follower.aggregate([
+        { $match: { following_id: objectId } },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "follower_id",
+                foreignField: "_id",
+                as: "trainerData"
+            }
+        },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "follower_id",
+                foreignField: "_id",
+                as: "traineeData"
+            }
+        },
+        {
+            $addFields: {
+                followerDetails: {
+                    $cond: {
+                        if: { $gt: [{ $size: "$trainerData" }, 0] },
+                        then: { $arrayElemAt: ["$trainerData", 0] },
+                        else: { $arrayElemAt: ["$traineeData", 0] }
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                trainerData: 0,
+                traineeData: 0,
+                __v: 0
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                follower_id: 1,
+                following_id: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "followerDetails.firstName": 1,
+                "followerDetails.lastName": 1,
+                "followerDetails.profileImageUrl": 1,
+                "followerDetails.gender": 1,
+                "followerDetails.userName": 1
+            }
+        }
+    ]);
+    return followers;
 
-    // return formattedFollowers;
-    console.log(followers);
 }
 
 export const followAndUnfollowServices = {

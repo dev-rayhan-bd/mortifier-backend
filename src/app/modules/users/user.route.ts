@@ -16,6 +16,7 @@ router.post('/create-trainer',
     upload.single('file'),
     userController.createTrainer)
 router.get('/get-me', auth(), userController.getMe)
+router.get('/view-user/:id', auth(), userController.viewUser)
 // router.get('/get-me-trainee', auth(), userController.getMeTrainee)
 
 export const UserRouter = router;
