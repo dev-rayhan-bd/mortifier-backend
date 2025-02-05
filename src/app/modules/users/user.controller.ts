@@ -92,8 +92,10 @@ const getMe = async (req: Request, res: Response, next: NextFunction) => {
 
 const viewUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const user = req.user
+        console.log(user);
         const id = req.params.id
-        const result = await userServices.viewUser(id);
+        const result = await userServices.viewUser(id, user);
         res.status(200).json({
             success: true,
             message: 'get single user successfully',
