@@ -1,4 +1,4 @@
-import { SortOrder } from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 import { paginationHelpers } from "../../helpers/pagination";
 import { IContent } from "./content.interface";
 import { Content } from "./content.model";
@@ -77,9 +77,11 @@ const getAllContent = async (
     paginationOptions: any,
     searchTerm: any,
     role: any,
-    filtersData: any
+    filtersData: any,
+    user: any
 ): Promise<any> => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
+   const loggedInUserId = new mongoose.Types.ObjectId(user.id);
 
     const andConditions = [];
 
@@ -112,9 +114,7 @@ const getAllContent = async (
     const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
 
     const aggregationPipeline = [
-        {
-            $match: whereConditions,
-        },
+        { $match: whereConditions },
         {
             $lookup: {
                 from: "users",
@@ -123,12 +123,7 @@ const getAllContent = async (
                 as: "userDetails",
             },
         },
-        {
-            $unwind: {
-                path: "$userDetails",
-                preserveNullAndEmptyArrays: true, // Keep content even if no user found
-            },
-        },
+        { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
         {
             $lookup: {
                 from: "trainers",
@@ -145,19 +140,34 @@ const getAllContent = async (
                 as: "traineeDetails",
             },
         },
+        { $match: role ? { "userDetails.role": role } : {} },
         {
-            $match: role
-                ? { "userDetails.role": role }
-                : {},
+            $lookup: {
+                from: "likes",
+                let: { contentId: "$_id" },
+                pipeline: [
+                    { 
+                        $match: { 
+                            $expr: { 
+                                $and: [
+                                    { $eq: ["$contentId", "$$contentId"] }, 
+                                    { $eq: ["$userId", { $toObjectId: loggedInUserId }] } 
+                                ] 
+                            } 
+                        } 
+                    },
+                    { $limit: 1 }
+                ],
+                as: "likedByUser",
+            },
         },
         {
             $addFields: {
                 userInfo: {
-                    $arrayElemAt: [
-                        { $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0
-                    ]
-                }
-            }
+                    $arrayElemAt: [{ $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0],
+                },
+                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] }, // Check if there is a like from the logged-in user
+            },
         },
         {
             $project: {
@@ -173,21 +183,20 @@ const getAllContent = async (
                 "userDetails.role": 1,
                 "userInfo.firstName": 1,
                 "userInfo.lastName": 1,
-                "userInfo.profileImageUrl": 1
-            }
+                "userInfo.profileImageUrl": 1,
+                isLiked: 1,
+            },
         },
         { $sort: sortConditions },
     ];
 
-    // Get the total count after all filtering and transformations
     const totalResult = await Content.aggregate([
         ...aggregationPipeline,
-        { $count: "total" }
+        { $count: "total" },
     ]);
 
     const total = totalResult.length > 0 ? totalResult[0].total : 0;
 
-    // Apply pagination
     const result = await Content.aggregate([
         ...aggregationPipeline,
         { $skip: skip },
@@ -195,11 +204,7 @@ const getAllContent = async (
     ]);
 
     return {
-        meta: {
-            page,
-            limit,
-            total,
-        },
+        meta: { page, limit, total },
         data: result,
     };
 };
@@ -241,7 +246,7 @@ const deleteContent = async (id: string, user: any): Promise<IContent | null> =>
     }
 
     if (!content.userId) {
-        throw new AppError(400,"Content userId is missing");
+        throw new AppError(400, "Content userId is missing");
     }
     if (content?.userId.toString() as string !== user.id.toString()) {
         throw new AppError(403, "Unauthorized: You can't delete others' content");
