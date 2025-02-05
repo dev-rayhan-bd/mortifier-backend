@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { trainerServices } from "./trainer.services";
+import { IPaginationOptions } from "../../global/globalType";
 
 const updateTriner = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -27,7 +28,32 @@ const updateTriner = async (req: Request, res: Response, next: NextFunction) => 
     }
 }
 
+const getAllTrainer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { limit, page, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+
+        const paginationOptions: IPaginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
+        };
+
+        const result = await trainerServices.getAllTrainer(paginationOptions, searchTerm, filters);
+
+        res.status(200).json({
+            success: true,
+            message: 'get all trainer successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const trainerController = {
     updateTriner,
+    getAllTrainer,
 }
 
