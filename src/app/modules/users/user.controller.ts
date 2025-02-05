@@ -83,12 +83,23 @@ const getMe = async (req: Request, res: Response, next: NextFunction) => {
             message: 'get my data successfully',
             data: result,
         })
-        // sendResponse(res, {
-        //     statusCode: httpStatus.OK,
-        //     success: true,
-        //     message: 'user created successfully',
-        //     data: result,
-        // });
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const viewUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await userServices.viewUser(id);
+        res.status(200).json({
+            success: true,
+            message: 'get single user successfully',
+            data: result,
+        })
+
     }
     catch (error) {
         next(error)
@@ -121,5 +132,6 @@ export const userController = {
     createTrainee,
     createTrainer,
     getMe,
+    viewUser,
     // getMeTrainee,
 }

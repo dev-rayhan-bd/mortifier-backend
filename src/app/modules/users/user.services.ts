@@ -180,9 +180,54 @@ const getMe = async (user: any) => {
 //     return result
 // }
 
+const viewUser = async (id: any) => {
+    const userId = new mongoose.Types.ObjectId(id);
+
+    const result = await User.aggregate([
+        {
+            $match: { _id: userId },
+        },
+        {
+            $lookup: {
+                from: 'trainers',
+                localField: '_id',
+                foreignField: 'user',
+                as: 'trainerDetails',
+            },
+        },
+        {
+            $lookup: {
+                from: 'trainees',
+                localField: '_id',
+                foreignField: 'user',
+                as: 'traineeDetails',
+            },
+        },
+        {
+            $addFields: {
+                userInfo: {
+                    $arrayElemAt: [
+                        { $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0
+                    ]
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 0, // Excludes _id
+                userInfo: 1, // Only keeps userInfo
+            }
+        }
+    ]);
+
+    return result[0]; // Return as an object, not an array
+};
+
+
 export const userServices = {
     createTrainee,
     createTrainer,
     getMe,
+    viewUser,
     // getMeTrainee,
 }
