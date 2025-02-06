@@ -1,11 +1,13 @@
 import { Types } from "mongoose";
+import { SortOrder } from 'mongoose';
 
 export interface IPaginationOptions {
   limit: number;
   page: number;
   sortBy: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder | string;
 }
+
 
 export interface IReqUser {
   email: string;

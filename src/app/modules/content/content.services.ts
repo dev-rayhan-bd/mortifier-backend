@@ -5,6 +5,7 @@ import { Content } from "./content.model";
 import { Trainer } from "../trainer/trainer.model";
 import { Trainee } from "../trainee/trainee.model";
 import AppError from "../../errors/AppError";
+import { IPaginationOptions } from "../../global/globalType";
 
 
 const createContent = async (file: any, content: IContent, user: any): Promise<IContent> => {
@@ -74,8 +75,8 @@ const getMyContent = async (
 };
 
 const getAllContent = async (
-    paginationOptions: any,
-    searchTerm: any,
+    paginationOptions: IPaginationOptions,
+    searchTerm: string,
     role: any,
     filtersData: any,
     user: any

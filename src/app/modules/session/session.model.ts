@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Types } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { ITrainingSession } from "./session.interface";
 
 const videoSchema: Schema = new Schema({
@@ -10,6 +10,7 @@ const videoSchema: Schema = new Schema({
 
 const trainingSessionSchema: Schema<ITrainingSession> = new Schema({
     trainer_id: { type: Types.ObjectId, ref: "Trainer"},
+    title: { type: String, required: true},
     sessionType: { type: String, enum: ["live", "recorded"], required: true },
     sessionMode: { type: String, enum: ["group", "1on1"], required: true },
     fitnessFocus: { type: [String], required: true },
