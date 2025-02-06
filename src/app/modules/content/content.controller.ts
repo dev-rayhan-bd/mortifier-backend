@@ -94,7 +94,7 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
         };
         console.log(paginationOptions);
 
-        const result = await contentServices.getAllContent(paginationOptions,searchTerm,role, filters, user)
+        const result = await contentServices.getAllContent(paginationOptions,searchTerm as string,role, filters, user)
         res.status(200).json({
             success: true,
             message: 'get all content successfully',

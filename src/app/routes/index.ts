@@ -13,6 +13,7 @@ import { InvitationRouter } from "../modules/invitation/invitation.route";
 import { reviewRouter } from "../modules/review/review.route";
 import { followAndUnfollowRouter } from "../modules/follower/follower.route";
 import { LikesRouter } from "../modules/likes/likes.route";
+import { CommentsRouter } from "../modules/comments/comments.route";
 
 const router = Router();
 
@@ -64,6 +65,10 @@ const moduleRoutes = [
     {
         path: '/like',
         route: LikesRouter,
+    },
+    {
+        path: '/comment',
+        route: CommentsRouter,
     },
     {
         path: '/session',

@@ -8,6 +8,7 @@ interface Video {
 
 export interface ITrainingSession {
     trainer_id?: Types.ObjectId;
+    title: string,
     sessionType: "live" | "recorded";
     sessionMode: "group" | "1on1";
     fitnessFocus: string[];

@@ -20,6 +20,11 @@ export const trainingSessionValidatedSchema = z.object({
     trainer_id: z.custom<Types.ObjectId>((val) => Types.ObjectId.isValid(val), {
         message: "Invalid trainer ID",
     }).optional(),
+    
+    title: z.string({
+        required_error: "Title is required",
+        invalid_type_error: "Title must be a string",
+    }),
 
     sessionType: z.enum(["live", "recorded"], {
         required_error: "Session type is required",
