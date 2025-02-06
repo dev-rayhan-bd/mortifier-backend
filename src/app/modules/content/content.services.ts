@@ -81,10 +81,9 @@ const getAllContent = async (
     user: any
 ): Promise<any> => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
-   const loggedInUserId = new mongoose.Types.ObjectId(user.id);
+    const loggedInUserId = new mongoose.Types.ObjectId(user.id);
 
     const andConditions = [];
-
     const contentSearchableFields = ["title", "content", "specialism"];
 
     if (searchTerm) {
@@ -148,6 +147,20 @@ const getAllContent = async (
                 pipeline: [
                     { 
                         $match: { 
+                            $expr: { $eq: ["$contentId", "$$contentId"] }
+                        } 
+                    },
+                ],
+                as: "allLikes",
+            },
+        },
+        {
+            $lookup: {
+                from: "likes",
+                let: { contentId: "$_id" },
+                pipeline: [
+                    { 
+                        $match: { 
                             $expr: { 
                                 $and: [
                                     { $eq: ["$contentId", "$$contentId"] }, 
@@ -166,7 +179,8 @@ const getAllContent = async (
                 userInfo: {
                     $arrayElemAt: [{ $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0],
                 },
-                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] }, // Check if there is a like from the logged-in user
+                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] }, 
+                totalLikes: { $size: "$allLikes" },
             },
         },
         {
@@ -185,6 +199,7 @@ const getAllContent = async (
                 "userInfo.lastName": 1,
                 "userInfo.profileImageUrl": 1,
                 isLiked: 1,
+                totalLikes: 1,
             },
         },
         { $sort: sortConditions },

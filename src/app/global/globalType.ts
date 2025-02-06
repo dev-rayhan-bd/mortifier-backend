@@ -1,7 +1,17 @@
+import { Types } from "mongoose";
+
 export interface IPaginationOptions {
-    limit: number;
-    page: number;
-    sortBy: string;
-    sortOrder: 'asc' | 'desc';
-  }
-  
+  limit: number;
+  page: number;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface IReqUser {
+  email: string;
+  id: Types.ObjectId;
+  role: "trainer" | "trainee" | "admin" | "super_admin"; 
+  status: "in-progress" | "blocked";
+  iat: number;
+  exp: number;
+}
