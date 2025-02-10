@@ -184,7 +184,9 @@ const getIAmFollowing = async (id: any) => {
                 "followingDetails.userName": 1,
                 "followingDetails.role": 1
             }
-        }
+        },
+        { $limit: 6 },
+        { $sort: { createdAt: -1 } }
     ]);
 
     return following;
