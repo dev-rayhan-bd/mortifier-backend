@@ -32,24 +32,32 @@ const followAndUnfollow = async (data: IFollower) => {
 }
 
 const getMyfollower = async (id: any) => {
-
     const objectId = new mongoose.Types.ObjectId(id);
 
     const followers = await Follower.aggregate([
         { $match: { following_id: objectId } },
         {
             $lookup: {
-                from: "trainers",
+                from: "users", 
                 localField: "follower_id",
                 foreignField: "_id",
+                as: "userData"
+            }
+        },
+        { $unwind: "$userData" }, 
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "userData._id",
+                foreignField: "user",
                 as: "trainerData"
             }
         },
         {
             $lookup: {
                 from: "trainees",
-                localField: "follower_id",
-                foreignField: "_id",
+                localField: "userData._id",
+                foreignField: "user",
                 as: "traineeData"
             }
         },
@@ -58,8 +66,18 @@ const getMyfollower = async (id: any) => {
                 followerDetails: {
                     $cond: {
                         if: { $gt: [{ $size: "$trainerData" }, 0] },
-                        then: { $arrayElemAt: ["$trainerData", 0] },
-                        else: { $arrayElemAt: ["$traineeData", 0] }
+                        then: {
+                            $mergeObjects: [
+                                { role: "trainer" },
+                                { $arrayElemAt: ["$trainerData", 0] }
+                            ]
+                        },
+                        else: {
+                            $mergeObjects: [
+                                { role: "trainee" },
+                                { $arrayElemAt: ["$traineeData", 0] }
+                            ]
+                        }
                     }
                 }
             }
@@ -68,6 +86,7 @@ const getMyfollower = async (id: any) => {
             $project: {
                 trainerData: 0,
                 traineeData: 0,
+                userData: 0,
                 __v: 0
             }
         },
@@ -82,15 +101,98 @@ const getMyfollower = async (id: any) => {
                 "followerDetails.lastName": 1,
                 "followerDetails.profileImageUrl": 1,
                 "followerDetails.gender": 1,
-                "followerDetails.userName": 1
+                "followerDetails.userName": 1,
+                "followerDetails.role": 1
             }
         }
     ]);
+
     return followers;
 
 }
 
+const getIAmFollowing = async (id: any) => {
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    const following = await Follower.aggregate([
+        { $match: { follower_id: objectId } }, 
+        {
+            $lookup: {
+                from: "users", 
+                localField: "following_id",
+                foreignField: "_id",
+                as: "userData"
+            }
+        },
+        { $unwind: "$userData" }, 
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "userData._id",
+                foreignField: "user",
+                as: "trainerData"
+            }
+        },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "userData._id",
+                foreignField: "user",
+                as: "traineeData"
+            }
+        },
+        {
+            $addFields: {
+                followingDetails: {
+                    $cond: {
+                        if: { $gt: [{ $size: "$trainerData" }, 0] },
+                        then: {
+                            $mergeObjects: [
+                                { role: "trainer" },
+                                { $arrayElemAt: ["$trainerData", 0] }
+                            ]
+                        },
+                        else: {
+                            $mergeObjects: [
+                                { role: "trainee" },
+                                { $arrayElemAt: ["$traineeData", 0] }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                trainerData: 0,
+                traineeData: 0,
+                userData: 0,
+                __v: 0
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                follower_id: 1,
+                following_id: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "followingDetails.firstName": 1,
+                "followingDetails.lastName": 1,
+                "followingDetails.profileImageUrl": 1,
+                "followingDetails.gender": 1,
+                "followingDetails.userName": 1,
+                "followingDetails.role": 1
+            }
+        }
+    ]);
+
+    return following;
+};
+
+
 export const followAndUnfollowServices = {
     followAndUnfollow,
     getMyfollower,
+    getIAmFollowing,
 }

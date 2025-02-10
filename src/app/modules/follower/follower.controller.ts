@@ -46,8 +46,31 @@ const getMyfollower = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getIAmFollowing = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await followAndUnfollowServices.getIAmFollowing(id)
+
+        res.status(200).json({
+            success: true,
+            message: 'get who i am following successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 
 export const followAndUnfollowController = {
     followAndUnfollow,
     getMyfollower,
+    getIAmFollowing,
 }
