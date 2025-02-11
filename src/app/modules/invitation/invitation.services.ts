@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import AppError from "../../errors/AppError";
 import { IPaginationOptions } from "../../global/globalType";
 import { paginationHelpers } from "../../helpers/pagination";
@@ -87,19 +87,44 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
 
 }
 
-const getMyInvitation = async (trainee_id: string): Promise<IInvitation[]> => {
-
-    const isTraineeExist = await Trainee.findById({ _id: trainee_id })
+const getMyInvitation = async (trainee_id: string) => {
+    const isTraineeExist = await Trainee.findById(trainee_id);
     if (!isTraineeExist) {
-        throw new AppError(404, 'trainee does not exist!')
+        throw new AppError(404, "Trainee does not exist!");
     }
 
-    const getAllInvitations = await Invitation.find({
-        trainee_id: trainee_id,
-    });
-    
-    return getAllInvitations;
-}
+    const invitations = await Invitation.aggregate([
+        { $match: { trainee_id: new mongoose.Types.ObjectId(trainee_id) } },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "trainer_id",
+                foreignField: "_id",
+                as: "trainerData"
+            }
+        },
+        { $unwind: "$trainerData" },
+        // {
+        //     $project: {
+        //         _id: 1,
+        //         trainee_id: 1,
+        //         trainer_id: 1,
+        //         status: 1,
+        //         createdAt: 1,
+        //         updatedAt: 1,
+        //         "trainerData.firstName": "$userData.firstName",
+        //         "trainerData.lastName": "$userData.lastName",
+        //         "trainerData.email": "$userData.email",
+        //         "trainerData.profileImageUrl": "$userData.profileImageUrl",
+        //         "trainerData.userName": "$userData.userName",
+        //         "trainerData.gender": "$userData.gender"
+        //     }
+        // }
+    ]);
+
+    return invitations;
+};
+
 
 const rejectInvitation = async (id: string): Promise<IInvitation | null> => {
 
