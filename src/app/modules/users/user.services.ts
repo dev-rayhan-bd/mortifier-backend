@@ -29,12 +29,15 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
         throw new AppError(400, 'User already exists!')
     }
 
+    if(file) {
+        validateTraineeData.profileImageUrl = `/uploads/${file?.filename}`;
+    }
+
     const result = await User.create(userData);
-
-
+    
     if (result?._id) {
         validateTraineeData.user = result?._id
-        validateTraineeData.profileImageUrl = `/uploads/${file.filename}`;
+
         const traineeResult = await Trainee.create(validateTraineeData)
 
         const tokenPayload = {

@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import AppError from "../../errors/AppError"
 import { Invitation } from "../invitation/invitation.model"
 import { Trainee } from "../trainee/trainee.model"
@@ -19,7 +20,7 @@ const giveReview = async (data: IReview): Promise<IReview> => {
     }
 
     const result = await Review.create(data)
-    if(result) {
+    if (result) {
         await Invitation.deleteOne({
             trainer_id: result.trainer_id,
             trainee_id: result.trainee_id,
@@ -28,19 +29,33 @@ const giveReview = async (data: IReview): Promise<IReview> => {
     return result
 }
 
-const giveReviewOfTrainer = async (id: string): Promise<IReview[]> => {
+const getReviewOfTrainer = async (id: string): Promise<IReview[]> => {
 
     const isTrainerExist = await Trainer.findById({ _id: id })
     if (!isTrainerExist) {
         throw new AppError(404, 'trainer does not exist!')
     }
-
-    const result = await Review.find({ trainer_id: id }).limit(20)
-    return result
+    const allReviews = await Review.aggregate([
+        { $match: { trainer_id: new mongoose.Types.ObjectId(id) } },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "trainee_id",
+                foreignField: "_id",
+                as: "traineeData"
+            }
+        },
+        {
+            $unwind: "$traineeData",
+        },
+        { $limit: 10 },
+        { $sort: { createdAt: -1 } }
+    ])
+    return allReviews
 }
 
 
 export const reviewServices = {
     giveReview,
-    giveReviewOfTrainer,
+    getReviewOfTrainer,
 }

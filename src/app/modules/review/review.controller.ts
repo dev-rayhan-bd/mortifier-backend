@@ -24,10 +24,10 @@ const giveReview = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-const giveReviewOfTrainer = async (req: Request, res: Response, next: NextFunction) => {
+const getReviewOfTrainer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id
-        const result = await reviewServices.giveReviewOfTrainer(id)
+        const result = await reviewServices.getReviewOfTrainer(id)
 
         res.status(200).json({
             success: true,
@@ -49,5 +49,5 @@ const giveReviewOfTrainer = async (req: Request, res: Response, next: NextFuncti
 
 export const reviewController = {
     giveReview,
-    giveReviewOfTrainer,
+    getReviewOfTrainer,
 }
