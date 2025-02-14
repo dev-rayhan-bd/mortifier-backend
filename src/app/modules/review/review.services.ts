@@ -48,7 +48,7 @@ const getReviewOfTrainer = async (id: string): Promise<IReview[]> => {
         {
             $unwind: "$traineeData",
         },
-        { $limit: 10 },
+        { $limit: 9 },
         { $sort: { createdAt: -1 } }
     ])
     return allReviews
