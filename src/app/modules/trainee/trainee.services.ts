@@ -66,6 +66,93 @@ const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>) => 
 
 }
 
+const getAllForAdminTrainee = async (
+    paginationOptions: IPaginationOptions,
+    searchTerm: any,
+    filtersData: any
+): Promise<any> => {
+    const { limit, page, skip, sortBy, sortOrder } =
+        paginationHelpers.calculatePagination(paginationOptions);
+
+    const andConditions: any[] = [];
+
+    const contentSearchableFields = ["firstName", "lastName"];
+   
+    if (searchTerm) {
+        andConditions.push({
+            $or: contentSearchableFields.map((field) => ({
+                [field]: { $regex: searchTerm, $options: "i" },
+            })),
+        });
+    }
+
+    if (Object.keys(filtersData).length) {
+        andConditions.push({
+            $and: Object.entries(filtersData).map(([field, value]) => ({
+                [field]: value,
+            })),
+        });
+    }
+
+    const sortConditions: { [key: string]: 1 | -1 } = {};
+    if (sortBy && sortOrder) {
+        sortConditions[sortBy] = sortOrder === "asc" || sortOrder === "ascending" ? 1 : -1;
+    }
+
+    const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
+
+    const result = await Trainee.aggregate([
+        {
+            $match: whereConditions,
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "userData",
+            },
+        },
+        
+        {
+            $unwind: {
+                path: "$userData",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $sort: sortConditions,
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        {
+            $project: {
+
+                userData: {
+                    password: 0,
+
+                },
+            },
+        },
+    ]);
+
+    const total = await Trainee.countDocuments(whereConditions);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+        },
+        data: result,
+    };
+};
+
+
 const getTraineesByMonth = async () => {
     const result = await Trainee.aggregate([
       {
@@ -116,5 +203,6 @@ const getTraineesByMonth = async () => {
 export const traineeServices = {
     getAllTrainee,
     updateTrainee,
+    getAllForAdminTrainee,
     getTraineesByMonth,
 }
