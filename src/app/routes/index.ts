@@ -14,6 +14,7 @@ import { reviewRouter } from "../modules/review/review.route";
 import { followAndUnfollowRouter } from "../modules/follower/follower.route";
 import { LikesRouter } from "../modules/likes/likes.route";
 import { CommentsRouter } from "../modules/comments/comments.route";
+import { PolicyAndTemrmsRouter } from "../modules/policyAndTerms/policyAndTerms.route";
 
 const router = Router();
 
@@ -73,6 +74,10 @@ const moduleRoutes = [
     {
         path: '/session',
         route: SessionRouter,
+    },
+    {
+        path: '/policy-term',
+        route: PolicyAndTemrmsRouter,
     },
     {
         path: '/chats',
