@@ -44,8 +44,26 @@ const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const getAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user
+        const result = await adminServices.getAdmin(user);
+
+        res.status(200).json({
+            success: true,
+            message: 'get admin info successfully',
+            data: result,
+        })
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 
 export const adminController = {
     createAdmin,
     updateAdmin,
+    getAdmin,
 }

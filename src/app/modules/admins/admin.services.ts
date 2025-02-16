@@ -2,6 +2,8 @@ import mongoose from "mongoose"
 import AppError from "../../errors/AppError"
 import { IAdmin } from "./admin.interface"
 import { Admin } from "./admin.model"
+import { IReqUser } from "../../global/globalType"
+import { JwtPayload } from "jsonwebtoken"
 
 
 const createAdmin = async (data: IAdmin): Promise<IAdmin> => {
@@ -38,7 +40,20 @@ const updateAdmin = async (user: any, file: any, data: Partial<IAdmin>) => {
 
 }
 
+const getAdmin = async (user: JwtPayload | null) => {
+    if (!user) {
+        throw new AppError(400, 'User is not authenticated');
+    }
+    const result = await Admin.aggregate([
+        { $match: { _id:  new mongoose.Types.ObjectId(user.id)} },
+        { $project: { password: 0 } }
+    ])
+
+    return result
+}
+
 export const adminServices = {
     createAdmin,
     updateAdmin,
+    getAdmin,
 }

@@ -9,6 +9,7 @@ import { upload } from "../../helpers/fileUploader";
 const router = Router();
 
 router.post('/create', validateRequest(adminValidation.adminValidationSchema), adminController.createAdmin)
-router.patch('/update', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), upload.single('file') , adminController.updateAdmin)
+router.get('/get-admin-info', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), adminController.getAdmin)
+router.patch('/update', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), upload.single('file'), adminController.updateAdmin)
 
 export const AdminRouter = router
