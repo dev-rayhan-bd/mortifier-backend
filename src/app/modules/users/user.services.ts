@@ -310,7 +310,7 @@ const blockUnblock = async (id: string): Promise<any> => {
     const uploadedStatus = {
         status: newStatus
     }
-    console.log(uploadedStatus);
+
     const result = await User.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
     return {
         message: `user ${result?.status}`
