@@ -26,25 +26,25 @@ export const trainingSessionValidatedSchema = z.object({
         invalid_type_error: "Title must be a string",
     }),
 
-    sessionType: z.enum(["live", "recorded"], {
+    sessionType: z.enum(["live_group" , "recorded" , "1on1"], {
         required_error: "Session type is required",
         invalid_type_error: "Session type must be 'live' or 'recorded'",
     }),
 
-    sessionMode: z.enum(["group", "1on1"], {
-        required_error: "Session mode is required",
-        invalid_type_error: "Session mode must be 'group' or '1on1'",
-    }),
+    // sessionMode: z.enum(["group", "1on1"], {
+    //     required_error: "Session mode is required",
+    //     invalid_type_error: "Session mode must be 'group' or '1on1'",
+    // }),
 
-    fitnessFocus: z.array(z.string({
+    fitnessFocus: z.string({
         required_error: "Fitness focus is required",
         invalid_type_error: "Fitness focus must be a string",
-    })),
+    }),
 
     otherFocus: z.string({
         required_error: "Other focus is required",
         invalid_type_error: "Other focus must be a string",
-    }).min(1, "Other focus cannot be empty"),
+    }).optional(),
 
     recordedContent: z.array(VideoSchema).optional(),
 
@@ -53,7 +53,7 @@ export const trainingSessionValidatedSchema = z.object({
         invalid_type_error: "Access type must be 'free', 'membership', or 'followers'",
     }),
 
-    frequency: z.enum(["weekly", "monthly"], {
+    frequency: z.enum(["weekly", "fortnightly", "monthly"], {
         required_error: "Frequency is required",
         invalid_type_error: "Frequency must be 'weekly' or 'monthly'",
     }),
@@ -61,7 +61,7 @@ export const trainingSessionValidatedSchema = z.object({
     membership_fee: z.number({
         required_error: "Membership fee is required",
         invalid_type_error: "Membership fee must be a number",
-    }).min(0, "Membership fee cannot be negative"),
+    }).optional(),
 
     promo_image: z.string().url("Promo image must be a valid URL").optional(),
 

@@ -11,6 +11,10 @@ router.post('/create', auth(),
         { name: 'video', maxCount: 1 },
     ]), sessionController.createSession)
     router.get('/', auth(), sessionController.getAllSession)
+    router.get('/:id', auth(), sessionController.getMySession)
+    router.get('/single/:id', auth(), sessionController.getSingleSession)
     router.patch('/:id', auth(), upload.single('file'), sessionController.updateSession)
+    router.delete('/delete-video', auth(), sessionController.deleteSessionContent)
+    router.delete('/:id', auth(), sessionController.deleteWholeSession)
 
 export const SessionRouter = router;

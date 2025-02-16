@@ -77,8 +77,83 @@ const updateSession = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+
+const getMySession = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { limit, page, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+        const trainerId = req.params.id
+
+        const paginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'desc',
+        };
+        console.log(paginationOptions);
+
+        const result = await sessionServices.getMySession(trainerId ,paginationOptions, searchTerm as string , filters)
+        res.status(200).json({
+            success: true,
+            message: 'get my session successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const getSingleSession = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await sessionServices.getSingleSession(id)
+        res.status(200).json({
+            success: true,
+            message: 'get single session successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const deleteSessionContent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const data = req.body
+        const result = await sessionServices.deleteSessionContent(data)
+        res.status(200).json({
+            success: true,
+            message: 'deleted session video successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const deleteWholeSession = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await sessionServices.deleteWholeSession(id)
+        res.status(200).json({
+            success: true,
+            message: 'deleted session successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const sessionController = {
     createSession,
     getAllSession,
     updateSession,
+    getMySession,
+    getSingleSession,
+    deleteSessionContent,
+    deleteWholeSession,
 }
