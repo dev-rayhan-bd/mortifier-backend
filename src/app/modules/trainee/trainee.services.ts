@@ -66,12 +66,99 @@ const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>) => 
 
 }
 
+const getAllForAdminTrainee = async (
+    paginationOptions: IPaginationOptions,
+    searchTerm: any,
+    filtersData: any
+): Promise<any> => {
+    const { limit, page, skip, sortBy, sortOrder } =
+        paginationHelpers.calculatePagination(paginationOptions);
+
+    const andConditions: any[] = [];
+
+    const contentSearchableFields = ["firstName", "lastName"];
+   
+    if (searchTerm) {
+        andConditions.push({
+            $or: contentSearchableFields.map((field) => ({
+                [field]: { $regex: searchTerm, $options: "i" },
+            })),
+        });
+    }
+
+    if (Object.keys(filtersData).length) {
+        andConditions.push({
+            $and: Object.entries(filtersData).map(([field, value]) => ({
+                [field]: value,
+            })),
+        });
+    }
+
+    const sortConditions: { [key: string]: 1 | -1 } = {};
+    if (sortBy && sortOrder) {
+        sortConditions[sortBy] = sortOrder === "asc" || sortOrder === "ascending" ? 1 : -1;
+    }
+
+    const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
+
+    const result = await Trainee.aggregate([
+        {
+            $match: whereConditions,
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "userData",
+            },
+        },
+        
+        {
+            $unwind: {
+                path: "$userData",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $sort: sortConditions,
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        {
+            $project: {
+
+                userData: {
+                    password: 0,
+
+                },
+            },
+        },
+    ]);
+
+    const total = await Trainee.countDocuments(whereConditions);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+        },
+        data: result,
+    };
+};
+
+
 const getTraineesByMonth = async () => {
     const result = await Trainee.aggregate([
       {
         $group: {
           _id: { $month: '$createdAt' },
-          trainer: { $sum: 1 },
+          user: { $sum: 1 },
         },
       },
       {
@@ -88,25 +175,25 @@ const getTraineesByMonth = async () => {
               in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
             },
           },
-          trainer: 1,
+          user: 1,
         },
       },
     ]);
   
 
     const allMonths = [
-      { month: 'jan', trainer: 0 }, { month: 'feb', trainer: 0 },
-      { month: 'mar', trainer: 0 }, { month: 'apr', trainer: 0 },
-      { month: 'may', trainer: 0 }, { month: 'jun', trainer: 0 },
-      { month: 'jul', trainer: 0 }, { month: 'aug', trainer: 0 },
-      { month: 'sep', trainer: 0 }, { month: 'oct', trainer: 0 },
-      { month: 'nov', trainer: 0 }, { month: 'dec', trainer: 0 },
+      { month: 'jan', user: 0 }, { month: 'feb', user: 0 },
+      { month: 'mar', user: 0 }, { month: 'apr', user: 0 },
+      { month: 'may', user: 0 }, { month: 'jun', user: 0 },
+      { month: 'jul', user: 0 }, { month: 'aug', user: 0 },
+      { month: 'sep', user: 0 }, { month: 'oct', user: 0 },
+      { month: 'nov', user: 0 }, { month: 'dec', user: 0 },
     ];
   
-    result.forEach(({ month, trainer }) => {
+    result.forEach(({ month, user }) => {
       const index = allMonths.findIndex((m) => m.month === month);
       if (index !== -1) {
-        allMonths[index].trainer = trainer;
+        allMonths[index].user = user;
       }
     });
   
@@ -116,5 +203,6 @@ const getTraineesByMonth = async () => {
 export const traineeServices = {
     getAllTrainee,
     updateTrainee,
+    getAllForAdminTrainee,
     getTraineesByMonth,
 }

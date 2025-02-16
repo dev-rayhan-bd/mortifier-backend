@@ -18,6 +18,34 @@ const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+
+const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const file = req?.file
+      const user = req.user
+      const data = JSON.parse(req?.body?.data)
+
+        const result = await adminServices.updateAdmin(user, file, data);
+
+        res.status(200).json({
+            success: true,
+            message: 'admin updated successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+
 export const adminController = {
     createAdmin,
+    updateAdmin,
 }

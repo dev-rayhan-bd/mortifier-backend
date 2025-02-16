@@ -52,6 +52,30 @@ const getAllTrainer = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getAllForAdminTrainer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { limit, page, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+
+        const paginationOptions: IPaginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
+        };
+
+        const result = await trainerServices.getAllForAdminTrainer(paginationOptions, searchTerm, filters);
+
+        res.status(200).json({
+            success: true,
+            message: 'get all trainer successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 const getTrainersByMonth = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await trainerServices.getTrainersByMonth();
@@ -71,5 +95,6 @@ export const trainerController = {
     updateTriner,
     getAllTrainer,
     getTrainersByMonth,
+    getAllForAdminTrainer,
 }
 

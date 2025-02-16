@@ -159,6 +159,38 @@ const changePassword = async (user: any, data: { oldPassword: string, newPasswor
 }
 
 
+const changeAdminPassword = async (user: any, data: { oldPassword: string, newPassword: string }): Promise<null> => {
+
+  const isExist = await Admin.findOne({ email: user.email })
+  if (!isExist) {
+    throw new AppError(404, 'User not found!')
+  }
+  if (isExist.status === 'blocked') {
+    throw new AppError(400, 'User is blocked!')
+  }
+  if (user?.id !== isExist._id.toString()) {
+    throw new AppError(400, 'You are not authorized to change this password!');
+  }
+
+  const matchedPassword = await bcrypt.compare(data?.oldPassword, isExist?.password);
+  if (!matchedPassword) {
+    throw new AppError(400, 'Password do not matched!');
+  }
+  const hashedNewPassword = await bcrypt.hash(data.newPassword, Number(config.bcrypt_salt_rounds))
+  const result = await Admin.findOneAndUpdate(
+    {
+      _id: user?.id,
+      role: user?.role,
+    },
+    {
+      password: hashedNewPassword,
+      passwordChangedAt: new Date(),
+    },
+  );
+  return null;
+}
+
+
 const forgetPassword = async (email: any): Promise<any> => {
 
   const isExist = await User.findOne({ email: email })
@@ -265,6 +297,7 @@ export const authServices = {
   logInAdmin,
   createRefreshToken,
   changePassword,
+  changeAdminPassword,
   forgetPassword,
   verifyCode,
   resetPassword,

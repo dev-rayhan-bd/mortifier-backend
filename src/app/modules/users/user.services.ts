@@ -1,3 +1,4 @@
+import { upload } from './../../helpers/fileUploader';
 import AppError from '../../errors/AppError';
 import { Trainee } from '../trainee/trainee.model';
 import { ITrainee } from '../trainee/trainee.interface';
@@ -300,6 +301,21 @@ const newUser = async () => {
     return result;
 };
 
+const blockUnblock = async (id: string): Promise<any> => {
+    const user = await User.findById(id);
+    if (!user) {
+        throw new AppError(400, 'user does not exits')
+    }
+    const newStatus = user.status === "blocked" ? "in-progress" : "blocked";
+    const uploadedStatus = {
+        status: newStatus
+    }
+    console.log(uploadedStatus);
+    const result = await User.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
+    return {
+        message: `user ${result?.status}`
+    }
+}
 
 
 export const userServices = {
@@ -308,5 +324,6 @@ export const userServices = {
     getMe,
     viewUser,
     newUser,
+    blockUnblock,
     // getMeTrainee,
 }

@@ -124,6 +124,22 @@ const newUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const blockUnblock = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await userServices.blockUnblock(id);
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result,
+        })
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 // const getMeTrainee = async (req: Request, res: Response, next: NextFunction) => {
 //     try {
 //         const user = req.user;
@@ -152,5 +168,6 @@ export const userController = {
     getMe,
     viewUser,
     newUser,
+    blockUnblock,
     // getMeTrainee,
 }
