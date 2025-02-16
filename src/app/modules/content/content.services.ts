@@ -272,6 +272,23 @@ const deleteContent = async (id: string, user: any): Promise<IContent | null> =>
     return result;
 }
 
+const blockUnblock = async (id: string): Promise<any> => {
+    const content = await Content.findById(id);
+    if (!content) {
+        throw new AppError(400, 'content does not exits')
+    }
+    const newStatus = content.status === "blocked" ? "in-progress" : "blocked";
+    const uploadedStatus = {
+        status: newStatus
+    }
+
+    const result = await Content.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
+    console.log(result);
+    return {
+        message: `content ${result?.status}`
+    }
+}
+
 export const contentServices = {
     createContent,
     getSingleContent,
@@ -279,4 +296,5 @@ export const contentServices = {
     getAllContent,
     updateContent,
     deleteContent,
+    blockUnblock,
 }
