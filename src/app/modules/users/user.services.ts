@@ -29,12 +29,12 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
         throw new AppError(400, 'User already exists!')
     }
 
-    if(file) {
+    if (file) {
         validateTraineeData.profileImageUrl = `/uploads/${file?.filename}`;
     }
 
     const result = await User.create(userData);
-    
+
     if (result?._id) {
         validateTraineeData.user = result?._id
 
@@ -234,14 +234,14 @@ const viewUser = async (id: any, loggedInUserId: any) => {
                         0,
                     ],
                 },
-                isFollowing: { $gt: [{ $size: "$followStatus" }, 0] }, // Check if following exists
+                isFollowing: { $gt: [{ $size: "$followStatus" }, 0] },
             },
         },
         {
             $project: {
-                _id: 0, // Excludes _id
+                _id: 0,
                 userInfo: 1,
-                isFollowing: 1, // Include the isFollowing status
+                isFollowing: 1,
             },
         },
     ]);
@@ -249,11 +249,64 @@ const viewUser = async (id: any, loggedInUserId: any) => {
     return result[0]
 };
 
+const newUser = async () => {
+    const result = await User.aggregate([
+        {
+            $sort: { createdAt: -1 },
+        },
+        {
+            $project: {
+                password: 0
+            }
+        },
+        {
+            $limit: 5,
+        },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "_id",
+                foreignField: "user",
+                as: "trainerDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "_id",
+                foreignField: "user",
+                as: "traineeDetails",
+            },
+        },
+
+        {
+            $addFields: {
+                userInfo: {
+                    $arrayElemAt: [
+                        { $concatArrays: ["$trainerDetails", "$traineeDetails"] },
+                        0,
+                    ],
+                },
+            },
+        },
+        {
+            $project: {
+                trainerDetails: 0,
+                traineeDetails: 0,
+            },
+        },
+    ]);
+
+    return result;
+};
+
+
 
 export const userServices = {
     createTrainee,
     createTrainer,
     getMe,
     viewUser,
+    newUser,
     // getMeTrainee,
 }

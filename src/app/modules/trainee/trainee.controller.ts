@@ -58,8 +58,25 @@ const updateTrainee = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+
+const getTraineesByMonth = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await traineeServices.getTraineesByMonth();
+
+        res.status(200).json({
+            success: true,
+            message: 'get users successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const traineeController = {
     getAllTrainee,
     updateTrainee,
+    getTraineesByMonth,
 }
 
