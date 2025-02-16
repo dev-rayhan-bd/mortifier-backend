@@ -74,8 +74,56 @@ const getAllTrainer = async (paginationOptions: IPaginationOptions, searchTerm: 
 
 }
 
+const getTrainersByMonth = async () => {
+    const result = await Trainer.aggregate([
+      {
+        $group: {
+          _id: { $month: '$createdAt' },
+          trainer: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: {
+            $let: {
+              vars: {
+                months: [
+                  'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                  'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+                ],
+              },
+              in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
+            },
+          },
+          trainer: 1,
+        },
+      },
+    ]);
+  
+
+    const allMonths = [
+      { month: 'jan', trainer: 0 }, { month: 'feb', trainer: 0 },
+      { month: 'mar', trainer: 0 }, { month: 'apr', trainer: 0 },
+      { month: 'may', trainer: 0 }, { month: 'jun', trainer: 0 },
+      { month: 'jul', trainer: 0 }, { month: 'aug', trainer: 0 },
+      { month: 'sep', trainer: 0 }, { month: 'oct', trainer: 0 },
+      { month: 'nov', trainer: 0 }, { month: 'dec', trainer: 0 },
+    ];
+  
+    result.forEach(({ month, trainer }) => {
+      const index = allMonths.findIndex((m) => m.month === month);
+      if (index !== -1) {
+        allMonths[index].trainer = trainer;
+      }
+    });
+  
+    return allMonths;
+  };
+
 
 export const trainerServices = {
     updateTrainer,
     getAllTrainer,
+    getTrainersByMonth,
 }

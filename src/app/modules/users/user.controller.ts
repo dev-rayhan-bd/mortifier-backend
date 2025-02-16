@@ -108,6 +108,22 @@ const viewUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const newUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const result = await userServices.newUser();
+        res.status(200).json({
+            success: true,
+            message: 'get new users successfully',
+            data: result,
+        })
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 // const getMeTrainee = async (req: Request, res: Response, next: NextFunction) => {
 //     try {
 //         const user = req.user;
@@ -135,5 +151,6 @@ export const userController = {
     createTrainer,
     getMe,
     viewUser,
+    newUser,
     // getMeTrainee,
 }

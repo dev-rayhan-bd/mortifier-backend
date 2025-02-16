@@ -52,8 +52,24 @@ const getAllTrainer = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getTrainersByMonth = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await trainerServices.getTrainersByMonth();
+
+        res.status(200).json({
+            success: true,
+            message: 'get trainers successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const trainerController = {
     updateTriner,
     getAllTrainer,
+    getTrainersByMonth,
 }
 

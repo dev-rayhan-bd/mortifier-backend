@@ -2,6 +2,7 @@ import { Router } from "express";
 import { userController } from "./user.controller";
 import auth from "../../middlewares/auth";
 import { upload } from "../../helpers/fileUploader";
+import { ENUM_USER_ROLE } from "../../enums/user";
 // import validateRequest from "../../middlewares/validateRequest";
 // import { userValidationSchema } from "./user.validation";
 
@@ -17,6 +18,7 @@ router.post('/create-trainer',
     userController.createTrainer)
 router.get('/get-me', auth(), userController.getMe)
 router.get('/view-user/:id', auth(), userController.viewUser)
+router.get('/new-users', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), userController.newUser)
 // router.get('/get-me-trainee', auth(), userController.getMeTrainee)
 
 export const UserRouter = router;
