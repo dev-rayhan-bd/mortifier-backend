@@ -158,7 +158,7 @@ const getTraineesByMonth = async () => {
       {
         $group: {
           _id: { $month: '$createdAt' },
-          trainer: { $sum: 1 },
+          user: { $sum: 1 },
         },
       },
       {
@@ -175,25 +175,25 @@ const getTraineesByMonth = async () => {
               in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
             },
           },
-          trainer: 1,
+          user: 1,
         },
       },
     ]);
   
 
     const allMonths = [
-      { month: 'jan', trainer: 0 }, { month: 'feb', trainer: 0 },
-      { month: 'mar', trainer: 0 }, { month: 'apr', trainer: 0 },
-      { month: 'may', trainer: 0 }, { month: 'jun', trainer: 0 },
-      { month: 'jul', trainer: 0 }, { month: 'aug', trainer: 0 },
-      { month: 'sep', trainer: 0 }, { month: 'oct', trainer: 0 },
-      { month: 'nov', trainer: 0 }, { month: 'dec', trainer: 0 },
+      { month: 'jan', user: 0 }, { month: 'feb', user: 0 },
+      { month: 'mar', user: 0 }, { month: 'apr', user: 0 },
+      { month: 'may', user: 0 }, { month: 'jun', user: 0 },
+      { month: 'jul', user: 0 }, { month: 'aug', user: 0 },
+      { month: 'sep', user: 0 }, { month: 'oct', user: 0 },
+      { month: 'nov', user: 0 }, { month: 'dec', user: 0 },
     ];
   
-    result.forEach(({ month, trainer }) => {
+    result.forEach(({ month, user }) => {
       const index = allMonths.findIndex((m) => m.month === month);
       if (index !== -1) {
-        allMonths[index].trainer = trainer;
+        allMonths[index].user = user;
       }
     });
   

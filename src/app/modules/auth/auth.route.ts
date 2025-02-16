@@ -25,6 +25,10 @@ router.post('/change-password',
     auth(ENUM_USER_ROLE.TRAINEE, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.TRAINER, ENUM_USER_ROLE.SUPER_ADMIN)
     , authController.changePassword)
 
+router.post('/change-admin-password',
+    auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN)
+    , authController.changeAdminPassword)
+
 router.post(
     '/forget-password',
     authController.forgetPassword

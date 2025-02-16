@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import AppError from "../../errors/AppError"
 import { IAdmin } from "./admin.interface"
 import { Admin } from "./admin.model"
@@ -8,7 +9,7 @@ const createAdmin = async (data: IAdmin): Promise<IAdmin> => {
     if (isExist) {
         throw new AppError(409, 'Admin already exist!')
     }
-    const adminData ={
+    const adminData = {
         firstName: data?.firstName,
         lastName: data?.lastName,
         email: data?.email,
@@ -21,7 +22,23 @@ const createAdmin = async (data: IAdmin): Promise<IAdmin> => {
 }
 
 
+const updateAdmin = async (user: any, file: any, data: Partial<IAdmin>) => {
+
+    if (file) {
+        data.profileImageUrl = `/uploads/${file.filename}`;
+    }
+
+    const result = await Admin.findByIdAndUpdate(
+        { _id: user.id },
+        data,
+        { new: true }
+    );
+
+    return result
+
+}
 
 export const adminServices = {
     createAdmin,
+    updateAdmin,
 }
