@@ -53,7 +53,8 @@ const myEnrolledSesion = async (data: JwtPayload | null) => {
             $project: {
                 "sessionDetails.recordedContent": 0
             }
-        }
+        },
+        { $unwind: "$sessionDetails" }
     ])
 
     return session;
