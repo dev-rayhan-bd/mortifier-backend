@@ -7,7 +7,7 @@ const purchaseAccessSchema: Schema<IPurchaseAccess> = new Schema({
     purchaseDate: { type: Date, default: Date.now, required: true },
     paymentStatus: {
         type: String,
-        enum: ["pending", "paid", "failed"],
+        enum: ["pending", "paid", "failed", "free"],
         required: true,
         default: "pending",
     },

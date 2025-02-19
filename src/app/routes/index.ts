@@ -15,6 +15,7 @@ import { followAndUnfollowRouter } from "../modules/follower/follower.route";
 import { LikesRouter } from "../modules/likes/likes.route";
 import { CommentsRouter } from "../modules/comments/comments.route";
 import { PolicyAndTemrmsRouter } from "../modules/policyAndTerms/policyAndTerms.route";
+import { PurchaseAccessRouter } from "../modules/purchaseAccess/purchaseAccess.route";
 
 const router = Router();
 
@@ -78,6 +79,10 @@ const moduleRoutes = [
     {
         path: '/policy-term',
         route: PolicyAndTemrmsRouter,
+    },
+    {
+        path: '/access',
+        route: PurchaseAccessRouter,
     },
     {
         path: '/chats',
