@@ -4,7 +4,7 @@ export interface IPurchaseAccess {
     session_id?: Types.ObjectId;
     user_id?: Types.ObjectId;
     purchaseDate: Date;
-    paymentStatus: "pending" | "paid" | "failed";
+    paymentStatus: "pending" | "paid" | "failed" | "free";
     paymentDetails?: {
         transactionId: string;
         amountPaid: number;
