@@ -3,6 +3,7 @@ import { IPurchaseAccess } from "./purchaseAccess.interface";
 
 const purchaseAccessSchema: Schema<IPurchaseAccess> = new Schema({
     session_id: { type: Types.ObjectId, ref: "TrainingSession"},
+    trainer_id: { type: Types.ObjectId, ref: "Trainer"},
     user_id: { type: Types.ObjectId, ref: "User"},
     purchaseDate: { type: Date, default: Date.now, required: true },
     paymentStatus: {
