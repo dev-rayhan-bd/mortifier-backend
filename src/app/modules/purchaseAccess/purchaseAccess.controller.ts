@@ -68,10 +68,44 @@ const getTotalEnrollment = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
+const getTotalEnrollmentForTrainer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const trainerId = req.params.id
+        const result = await purchaseAccessServices.getTotalEnrollmentForTrainer(trainerId);
+
+        res.status(200).json({
+            success: true,
+            message: 'get total members of trainer successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const myMemberships = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user
+        const result = await purchaseAccessServices.myMemberships(user);
+
+        res.status(200).json({
+            success: true,
+            message: 'get total myMemberships of trainee successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 
 export const purchaseAccessController = {
     checkEnrollment,
     enrollNow,
     myEnrolledSesion,
     getTotalEnrollment,
+    getTotalEnrollmentForTrainer,
+    myMemberships,
 }
