@@ -6,6 +6,7 @@ import { ENUM_USER_ROLE } from "../../enums/user";
 
 const router = Router();
 
+router.get('/:id', trainerController.getSingleTrainer)
 router.patch('/:id',
     upload.single('file'), auth(ENUM_USER_ROLE.TRAINER, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN), trainerController.updateTriner)
     router.get('/', auth(), trainerController.getAllTrainer)

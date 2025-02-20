@@ -57,10 +57,45 @@ const getAllTrainer = async (paginationOptions: IPaginationOptions, searchTerm: 
 
     const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
 
-    const result = await Trainer.find(whereConditions)
-        .sort(sortConditions)
-        .skip(skip)
-        .limit(limit)
+    const result = await Trainer.aggregate([
+        {
+            $match: whereConditions,
+        },
+        {
+            $lookup: {
+                from: "specialisms",
+                localField: "_id",
+                foreignField: "trainer_id",
+                as: "allSpecialism",
+            },
+        },
+        
+        // {
+        //     $unwind: {
+        //         path: "$specialism",
+        //         preserveNullAndEmptyArrays: true,
+        //     },
+        // },
+        {
+            $sort: sortConditions,
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        {
+            $project: {
+
+                userData: {
+                    password: 0,
+
+                },
+            },
+        },
+    ]);
+
     const total = await Trainer.countDocuments(whereConditions);
 
     return {
@@ -208,10 +243,23 @@ const getTrainersByMonth = async () => {
     return allMonths;
   };
 
+  
+const getSingleTrainer = async (id: string): Promise<ITrainer | null> => {
+
+    const result = await Trainer.findById(
+        {
+            _id: id
+        }
+    )
+    return result
+
+}
+
 
 export const trainerServices = {
     updateTrainer,
     getAllTrainer,
     getAllForAdminTrainer,
     getTrainersByMonth,
+    getSingleTrainer,
 }
