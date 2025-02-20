@@ -60,6 +60,9 @@ const trainerSchema = new Schema<ITrainer>(
     qualification: {
       type: [String],
     },
+    specialism: {
+      type: [String],
+    },
     radius: {
       type: String,
     },

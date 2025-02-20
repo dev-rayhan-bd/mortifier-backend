@@ -91,10 +91,27 @@ const getTrainersByMonth = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
+const getSingleTrainer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await trainerServices.getSingleTrainer(id);
+
+        res.status(200).json({
+            success: true,
+            message: 'get single trainer successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const trainerController = {
     updateTriner,
     getAllTrainer,
     getTrainersByMonth,
     getAllForAdminTrainer,
+    getSingleTrainer,
 }
 

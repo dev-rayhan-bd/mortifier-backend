@@ -15,6 +15,7 @@ export interface ITrainer {
   faceToFace: 'yes' | 'no';
   consultationType: 'paid' | 'free';
   qualification?: string[];
+  specialism?: string[];
   radius?: string;
   TikTok?: string;
   Instagram?: string;

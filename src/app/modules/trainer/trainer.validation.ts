@@ -74,6 +74,13 @@ export const trainerValidatedSchema = z.object({
         })
         .optional(),
 
+    specialism: z
+        .array(z.string(), {
+            required_error: "Specialism is required",
+            invalid_type_error: "Specialism must be a string",
+        })
+        .optional(),
+
     radius: z.string({
         required_error: "Radius is required",
         invalid_type_error: "Radius must be a string",
