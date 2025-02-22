@@ -36,78 +36,79 @@ const getMyfollower = async (id: any) => {
 
     const followers = await Follower.aggregate([
         { $match: { following_id: objectId } },
-        {
-            $lookup: {
-                from: "users", 
-                localField: "follower_id",
-                foreignField: "_id",
-                as: "userData"
-            }
-        },
-        { $unwind: "$userData" }, 
-        {
-            $lookup: {
-                from: "trainers",
-                localField: "userData._id",
-                foreignField: "user",
-                as: "trainerData"
-            }
-        },
-        {
-            $lookup: {
-                from: "trainees",
-                localField: "userData._id",
-                foreignField: "user",
-                as: "traineeData"
-            }
-        },
-        {
-            $addFields: {
-                followerDetails: {
-                    $cond: {
-                        if: { $gt: [{ $size: "$trainerData" }, 0] },
-                        then: {
-                            $mergeObjects: [
-                                { role: "trainer" },
-                                { $arrayElemAt: ["$trainerData", 0] }
-                            ]
-                        },
-                        else: {
-                            $mergeObjects: [
-                                { role: "trainee" },
-                                { $arrayElemAt: ["$traineeData", 0] }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        {
-            $project: {
-                trainerData: 0,
-                traineeData: 0,
-                userData: 0,
-                __v: 0
-            }
-        },
-        {
-            $project: {
-                _id: 1,
-                follower_id: 1,
-                following_id: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                "followerDetails.firstName": 1,
-                "followerDetails.lastName": 1,
-                "followerDetails.profileImageUrl": 1,
-                "followerDetails.gender": 1,
-                "followerDetails.userName": 1,
-                "followerDetails.role": 1
-            }
-        }
+        // {
+        //     $lookup: {
+        //         from: "users", 
+        //         localField: "follower_id",
+        //         foreignField: "_id",
+        //         as: "userData"
+        //     }
+        // },
+        // { $unwind: "$userData" }, 
+        // {
+        //     $lookup: {
+        //         from: "trainers",
+        //         localField: "userData._id",
+        //         foreignField: "user",
+        //         as: "trainerData"
+        //     }
+        // },
+        // {
+        //     $lookup: {
+        //         from: "trainees",
+        //         localField: "userData._id",
+        //         foreignField: "user",
+        //         as: "traineeData"
+        //     }
+        // },
+        // {
+        //     $addFields: {
+        //         followerDetails: {
+        //             $cond: {
+        //                 if: { $gt: [{ $size: "$trainerData" }, 0] },
+        //                 then: {
+        //                     $mergeObjects: [
+        //                         { role: "trainer" },
+        //                         { $arrayElemAt: ["$trainerData", 0] }
+        //                     ]
+        //                 },
+        //                 else: {
+        //                     $mergeObjects: [
+        //                         { role: "trainee" },
+        //                         { $arrayElemAt: ["$traineeData", 0] }
+        //                     ]
+        //                 }
+        //             }
+        //         }
+        //     }
+        // },
+        // {
+        //     $project: {
+        //         trainerData: 0,
+        //         traineeData: 0,
+        //         userData: 0,
+        //         __v: 0
+        //     }
+        // },
+        // {
+        //     $project: {
+        //         _id: 1,
+        //         follower_id: 1,
+        //         following_id: 1,
+        //         createdAt: 1,
+        //         updatedAt: 1,
+        //         "followerDetails.firstName": 1,
+        //         "followerDetails.lastName": 1,
+        //         "followerDetails.profileImageUrl": 1,
+        //         "followerDetails.gender": 1,
+        //         "followerDetails.userName": 1,
+        //         "followerDetails.role": 1
+        //     }
+        // }
+        { $count: "totalFollower" }
     ]);
 
-    return followers;
+    return followers.length > 0 ? followers[0] : { totalFollower: 0 };;
 
 }
 
@@ -115,16 +116,16 @@ const getIAmFollowing = async (id: any) => {
     const objectId = new mongoose.Types.ObjectId(id);
 
     const following = await Follower.aggregate([
-        { $match: { follower_id: objectId } }, 
+        { $match: { follower_id: objectId } },
         {
             $lookup: {
-                from: "users", 
+                from: "users",
                 localField: "following_id",
                 foreignField: "_id",
                 as: "userData"
             }
         },
-        { $unwind: "$userData" }, 
+        { $unwind: "$userData" },
         {
             $lookup: {
                 from: "trainers",

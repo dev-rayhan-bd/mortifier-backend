@@ -13,8 +13,15 @@ const auth =
           throw new AppError(401, 'You are not authorized')
         }
 
-        let verifiedUser = null
-        verifiedUser = verifyToken(token, config.jwt_access_secret as Secret)
+        let verifiedUser = null;
+        try {
+          verifiedUser = verifyToken(token, config.jwt_access_secret as Secret);
+        } catch (error: any) {
+          if (error.name === 'TokenExpiredError') {
+            throw new AppError(401, 'Session expired. Please log in again.');
+          }
+          throw error;
+        }
 
         if (verifiedUser.status === 'blocked') {
           throw new AppError(403, 'This user is blocked!');

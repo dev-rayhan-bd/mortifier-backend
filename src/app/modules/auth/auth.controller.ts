@@ -5,7 +5,6 @@ import config from "../../config";
 const logInUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const loginData = req.body;
-    console.log('controlling login', loginData);
     const result = await authServices.logInUser(loginData)
 
     const { refreshToken, ...others } = result
@@ -53,11 +52,10 @@ const logInAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
 const createRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.cookies;
-    console.log(refreshToken)
+    const refreshToken  = req.cookies.refreshToken;
+    console.log('refresh', refreshToken)
     const result = await authServices.createRefreshToken(refreshToken)
 
-    console.log('refresh', refreshToken)
     const cookieOptions = {
       secure: config.node_env === 'production',
       httpOnly: true,
