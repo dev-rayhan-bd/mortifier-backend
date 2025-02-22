@@ -18,7 +18,13 @@ const getAllOfUserQualification = async (id: string): Promise<IQualification[] |
     return result;
 }
 
+const deleteQualification = async (id: string): Promise<IQualification | null> => {
+    const result = await Qualification.findByIdAndDelete({ _id: id });
+    return result;
+}
+
 export const qualificationServices = {
     createQualification,
     getAllOfUserQualification,
+    deleteQualification,
 }

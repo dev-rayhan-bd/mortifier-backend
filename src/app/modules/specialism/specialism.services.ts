@@ -17,7 +17,14 @@ const getAllOfUserSpecialism = async (id: string): Promise<ISpecialism[] | null>
     return result;
 }
 
+const deleteSpecialism = async (id: string): Promise<ISpecialism | null> => {
+    const result = await Specialism.findByIdAndDelete({ _id: id });
+    return result;
+}
+
+
 export const specialismServices = {
     createSpecialism,
     getAllOfUserSpecialism,
+    deleteSpecialism,
 }
