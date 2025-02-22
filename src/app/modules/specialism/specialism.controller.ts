@@ -51,7 +51,31 @@ const getAllOfUserSpecialism = async (req: Request, res: Response, next: NextFun
     }
 }
 
+const deleteSpecialism = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+
+        const result = await specialismServices.deleteSpecialism(id);
+
+        res.status(200).json({
+            success: true,
+            message: 'deleted specialism successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const specialismController = {
     createSpecialism,
     getAllOfUserSpecialism,
+    deleteSpecialism,
 }
