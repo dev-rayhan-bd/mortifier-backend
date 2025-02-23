@@ -89,6 +89,68 @@ const getAllSession = async (
     ]);
     const result = await TrainingSession.aggregate([
         { $match: whereConditions },
+        { $match: { status: { $ne: "blocked" } } },
+        { $sort: sortConditions },
+        { $skip: skip },
+        { $limit: limit },
+        {
+            $project: {
+                recordedContent: 0
+            }
+        }
+    ])
+    const total = totalResult.length > 0 ? totalResult[0].total : 0;
+
+
+
+    return {
+        meta: { page, limit, total },
+        data: result,
+    };
+}
+
+const getAllSessionForAdmin = async (
+    paginationOptions: IPaginationOptions,
+    searchTerm: string | undefined,
+    filtersData: any,
+) => {
+    const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
+
+
+    const andConditions = [];
+    const contentSearchableFields = ["title"];
+
+    if (searchTerm) {
+        andConditions.push({
+            $or: contentSearchableFields.map((field) => ({
+                [field]: {
+                    $regex: searchTerm,
+                    $options: "i",
+                },
+            })),
+        });
+    }
+
+    if (Object.keys(filtersData).length) {
+        andConditions.push({
+            $and: Object.entries(filtersData).map(([field, value]) => ({
+                [field]: value,
+            })),
+        });
+    }
+
+    const sortConditions: { [key: string]: 1 | -1 } = {};
+    if (sortBy && sortOrder) {
+        sortConditions[sortBy] = sortOrder === 'asc' || sortOrder === 'ascending' ? 1 : -1;
+    }
+
+    const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
+    const totalResult = await TrainingSession.aggregate([
+        { $match: whereConditions },
+        { $count: "total" },
+    ]);
+    const result = await TrainingSession.aggregate([
+        { $match: whereConditions },
         { $sort: sortConditions },
         { $skip: skip },
         { $limit: limit },
@@ -220,6 +282,7 @@ const blockUnblock = async (id: string): Promise<any> => {
 export const sessionServices = {
     createSession,
     getAllSession,
+    getAllSessionForAdmin,
     updateSession,
     getMySession,
     getSingleSession,

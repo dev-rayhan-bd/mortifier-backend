@@ -12,6 +12,7 @@ router.post('/create', auth(),
         { name: 'video', maxCount: 1 },
     ]), sessionController.createSession)
     router.get('/', auth(), sessionController.getAllSession)
+    router.get('/admin', auth(ENUM_USER_ROLE.ADMIN,ENUM_USER_ROLE.SUPER_ADMIN), sessionController.getAllSessionForAdmin)
     router.get('/:id', auth(), sessionController.getMySession)
     router.get('/single/:id', auth(), sessionController.getSingleSession)
     router.patch('/:id', auth(), upload.single('file'), sessionController.updateSession)
