@@ -20,13 +20,13 @@ export const trainingSessionValidatedSchema = z.object({
     trainer_id: z.custom<Types.ObjectId>((val) => Types.ObjectId.isValid(val), {
         message: "Invalid trainer ID",
     }).optional(),
-    
+
     title: z.string({
         required_error: "Title is required",
         invalid_type_error: "Title must be a string",
     }),
 
-    sessionType: z.enum(["live_group" , "recorded" , "1on1"], {
+    sessionType: z.enum(["live_group", "recorded", "1on1"], {
         required_error: "Session type is required",
         invalid_type_error: "Session type must be 'live' or 'recorded'",
     }),
@@ -35,6 +35,10 @@ export const trainingSessionValidatedSchema = z.object({
     //     required_error: "Session mode is required",
     //     invalid_type_error: "Session mode must be 'group' or '1on1'",
     // }),
+    status: z.enum(["in-progress", "blocked"], {
+        required_error: "Status is required",
+        invalid_type_error: "Status must be 'in-progress' or 'blocked'",
+    }),
 
     fitnessFocus: z.string({
         required_error: "Fitness focus is required",

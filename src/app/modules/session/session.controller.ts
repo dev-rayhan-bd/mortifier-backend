@@ -148,6 +148,21 @@ const deleteWholeSession = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
+const blockUnblock = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await sessionServices.blockUnblock(id)
+        res.status(200).json({
+            success: true,
+            message: 'session status updated successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const sessionController = {
     createSession,
     getAllSession,
@@ -156,4 +171,5 @@ export const sessionController = {
     getSingleSession,
     deleteSessionContent,
     deleteWholeSession,
+    blockUnblock,
 }

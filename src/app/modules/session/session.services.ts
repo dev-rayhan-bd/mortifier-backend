@@ -6,6 +6,7 @@ import { IPaginationOptions } from "../../global/globalType";
 import { paginationHelpers } from "../../helpers/pagination";
 import mongoose from "mongoose";
 import { ITrainingSession } from "./session.interface";
+import AppError from "../../errors/AppError";
 
 
 const createSession = async (image: Express.Multer.File, video: Express.Multer.File, user: any, content: any) => {
@@ -22,6 +23,7 @@ const createSession = async (image: Express.Multer.File, video: Express.Multer.F
         throw new Error('Trainer not found');
     }
     content.trainer_id = isExistTrainer._id;
+    content.status = "in-progress";
 
     const result = await TrainingSession.create(content);
     return result;
@@ -196,6 +198,25 @@ const deleteWholeSession = async (
 };
 
 
+const blockUnblock = async (id: string): Promise<any> => {
+    const session = await TrainingSession.findById(id);
+    if (!session) {
+        throw new AppError(400, 'session does not exits')
+    }
+    const newStatus = session?.status === "blocked" ? "in-progress" : "blocked";
+    const uploadedStatus = {
+        status: newStatus
+    }
+
+    const result = await TrainingSession.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
+    console.log(result);
+    return {
+        message: `session ${result?.status}`
+    }
+}
+
+
+
 export const sessionServices = {
     createSession,
     getAllSession,
@@ -204,4 +225,5 @@ export const sessionServices = {
     getSingleSession,
     deleteSessionContent,
     deleteWholeSession,
+    blockUnblock,
 }
