@@ -3,32 +3,24 @@ import { model, Schema } from "mongoose";
 import { IChat, IChatAdmin } from "./chats.interface";
 
 const chatsSchema: Schema<IChat> = new Schema({
-  sender: {
+  sender:
+  {
     type: Schema.Types.ObjectId,
-    required: [true, 'Sender id is required'],
-    refPath: 'senderType',
+    required: [true, 'User id is required'],
+
   },
-  senderType: {
-    type: String,
-    required: true,
-    enum: ['Trainee', 'Trainer'],
-  },
-  receiver: {
+  receiver:
+  {
     type: Schema.Types.ObjectId,
-    required: [true, 'Receiver id is required'],
-    refPath: 'receiverType',
+    required: [true, 'User id is required'],
+
   },
-  receiverType: {
-    type: String,
-    required: true,
-    enum: ['Trainee', 'Trainer'],
-  },
-    message:
-    {
-        type: String, required: true
-    }
+  message:
+  {
+    type: String, required: true
+  }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 export const Chats = model<IChat>('Chats', chatsSchema);
@@ -65,28 +57,28 @@ export const Chats = model<IChat>('Chats', chatsSchema);
 //         timestamps: true,
 //       }
 //   );
-  
+
 //   export const ChatsAdmin = model<IChatAdmin>('ChatsAdmin', chatsAdminSchema);
 
 
 const chatsAdminSchema: Schema<IChatAdmin> = new Schema(
-    {
-        sender: {
-          type: String,  // Allowing both ObjectId and string
-          required: [true, 'Sender is required'],
-        },
-        receiver: {
-          type: String,  // Allowing both ObjectId and string
-          required: [true, 'Receiver is required'],
-        },
-        message: {
-          type: String,
-          required: [true, 'Message is required'],
-        },
-      },
-      {
-        timestamps: true,
-      }
-  );
-  
-  export const ChatsAdmin = model<IChatAdmin>('ChatsAdmin', chatsAdminSchema);
+  {
+    sender: {
+      type: String,  // Allowing both ObjectId and string
+      required: [true, 'Sender is required'],
+    },
+    receiver: {
+      type: String,  // Allowing both ObjectId and string
+      required: [true, 'Receiver is required'],
+    },
+    message: {
+      type: String,
+      required: [true, 'Message is required'],
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const ChatsAdmin = model<IChatAdmin>('ChatsAdmin', chatsAdminSchema);
