@@ -11,6 +11,7 @@ export interface ITrainingSession {
     title: string,
     sessionType: "live_group" | "recorded" | "1on1";
     // sessionMode: "group" | ;
+    status: "in-progress" | "blocked";
     fitnessFocus: string;
     otherFocus?: string;
     recordedContent?: Video[];

@@ -14,6 +14,7 @@ const trainingSessionSchema: Schema<ITrainingSession> = new Schema({
     title: { type: String, required: true},
     sessionType: { type: String, enum: ["live_group" , "recorded" , "1on1"], required: true },
     // sessionMode: { type: String, enum: ["group", "1on1"], required: true },
+    status: { type: String, enum: ["in-progress", "blocked"], default: "in-progress" },
     fitnessFocus: { type: String, required: true },
     otherFocus: { type: String },
     recordedContent: { type: [videoSchema] }, 

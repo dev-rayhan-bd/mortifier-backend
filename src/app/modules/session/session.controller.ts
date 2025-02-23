@@ -58,6 +58,30 @@ const getAllSession = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getAllSessionForAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { limit, page, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+
+        const paginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'desc',
+        };
+        console.log(paginationOptions);
+
+        const result = await sessionServices.getAllSessionForAdmin(paginationOptions, searchTerm as string , filters)
+        res.status(200).json({
+            success: true,
+            message: 'get all session successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 const updateSession = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const file = req.file
@@ -148,12 +172,29 @@ const deleteWholeSession = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
+const blockUnblock = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        const result = await sessionServices.blockUnblock(id)
+        res.status(200).json({
+            success: true,
+            message: 'session status updated successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 export const sessionController = {
     createSession,
     getAllSession,
+    getAllSessionForAdmin,
     updateSession,
     getMySession,
     getSingleSession,
     deleteSessionContent,
     deleteWholeSession,
+    blockUnblock,
 }
