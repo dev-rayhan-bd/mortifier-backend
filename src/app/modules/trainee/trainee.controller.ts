@@ -35,11 +35,11 @@ const getAllTrainee = async (req: Request, res: Response, next: NextFunction) =>
 const updateTrainee = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const file = req?.file
+        const userId = req.user
         const id = req.params.id
         // const user = req.user
-        const data = JSON.parse(req.body.data)
-
-        const result = await traineeServices.updateTrainee(file, id, data);
+        const { trainee, user } = JSON.parse(req.body.data)
+        const result = await traineeServices.updateTrainee(file, id, trainee, user, userId);
 
         res.status(200).json({
             success: true,

@@ -11,7 +11,7 @@ const createTrainee = async (req: Request, res: Response, next: NextFunction) =>
         const file = req.file
         const data = JSON.parse(req.body.data)
         const { userInfo, traineeData } = data;
-
+        console.log("userInfo", userInfo, "traineeData", traineeData);
         const validateUserInfo = userValidationSchema.parse(userInfo)
         const validateTraineeData = traineeValidatedSchema.parse(traineeData)
         const result = await userServices.createTrainee(validateUserInfo, validateTraineeData, file);

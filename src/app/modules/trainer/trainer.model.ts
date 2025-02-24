@@ -17,45 +17,37 @@ const trainerSchema = new Schema<ITrainer>(
     },
     contactNo: {
       type: String,
-      required: true,
     },
     profileImageUrl: {
       type: String,
     },
     dob: {
       type: Date,
-      required: true,
     },
     userName: {
       type: String,
-      required: true,
+      required: true
     },
     country: {
       type: String,
-      required: true,
     },
     zipCode: {
       type: Number,
-      required: true,
     },
     about: {
       type: String,
-      required: true,
     },
     onlineSession: {
       type: String,
       enum: ['yes', 'no'],
-      required: true,
     },
     faceToFace: {
       type: String,
       enum: ['yes', 'no'],
-      required: true,
     },
     consultationType: {
       type: String,
       enum: ['paid', 'free'],
-      required: true,
     },
     qualification: {
       type: [String],

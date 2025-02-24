@@ -1,14 +1,31 @@
+import mongoose from "mongoose";
 import { IPaginationOptions } from "../../global/globalType";
 import { paginationHelpers } from "../../helpers/pagination";
+import { Specialism } from "../specialism/specialism.model";
+import { User } from "../users/user.model";
 import { ITrainer } from "./trainer.interface";
 import { Trainer } from "./trainer.model";
+import { createToken } from "../../helpers/jwtHelper";
+import config from "../../config";
+import { Secret } from "jsonwebtoken";
 
 
-const updateTrainer = async (file: any, id: string, data: Partial<ITrainer>) => {
+const updateTrainer = async (file: any, id: string, data: Partial<ITrainer>, user: any, userId: any) => {
+
     if (file) {
         data.profileImageUrl = `/uploads/${file.filename}`;
     }
+    let userInfo = null;
+    if (user?.email) {
+        userInfo = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(String(userId.id)) }, user, { new: true })
+    }
 
+    if (data?.specialism) {
+        await Specialism.deleteMany({ trainer_id: id })
+        for (const spec of data?.specialism) {
+            await Specialism.create({ specialism: spec, trainer_id: id });
+        }
+    }
     const result = await Trainer.findByIdAndUpdate(
         {
             _id: id
@@ -18,7 +35,22 @@ const updateTrainer = async (file: any, id: string, data: Partial<ITrainer>) => 
             new: true
         }
     )
-    return result
+    const tokenPayload = {
+        email: userInfo?.email,
+        id: userInfo?._id,
+        role: userInfo?.role,
+        status: userInfo?.status
+    }
+
+    const accessToken = createToken(
+        tokenPayload,
+        config.jwt_access_secret as Secret,
+        config.jwt_access_expires_in as string,
+    )
+
+    return {
+        accessToken
+    }
 
 }
 
@@ -69,7 +101,7 @@ const getAllTrainer = async (paginationOptions: IPaginationOptions, searchTerm: 
                 as: "allSpecialism",
             },
         },
-        
+
         // {
         //     $unwind: {
         //         path: "$specialism",
@@ -120,7 +152,7 @@ const getAllForAdminTrainer = async (
     const andConditions: any[] = [];
 
     const contentSearchableFields = ["firstName", "lastName"];
-   
+
     if (searchTerm) {
         andConditions.push({
             $or: contentSearchableFields.map((field) => ({
@@ -156,7 +188,7 @@ const getAllForAdminTrainer = async (
                 as: "userData",
             },
         },
-        
+
         {
             $unwind: {
                 path: "$userData",
@@ -198,52 +230,52 @@ const getAllForAdminTrainer = async (
 
 const getTrainersByMonth = async () => {
     const result = await Trainer.aggregate([
-      {
-        $group: {
-          _id: { $month: '$createdAt' },
-          trainer: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          month: {
-            $let: {
-              vars: {
-                months: [
-                  'jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                  'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
-                ],
-              },
-              in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
+        {
+            $group: {
+                _id: { $month: '$createdAt' },
+                trainer: { $sum: 1 },
             },
-          },
-          trainer: 1,
         },
-      },
+        {
+            $project: {
+                _id: 0,
+                month: {
+                    $let: {
+                        vars: {
+                            months: [
+                                'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                                'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+                            ],
+                        },
+                        in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
+                    },
+                },
+                trainer: 1,
+            },
+        },
     ]);
-  
+
 
     const allMonths = [
-      { month: 'jan', trainer: 0 }, { month: 'feb', trainer: 0 },
-      { month: 'mar', trainer: 0 }, { month: 'apr', trainer: 0 },
-      { month: 'may', trainer: 0 }, { month: 'jun', trainer: 0 },
-      { month: 'jul', trainer: 0 }, { month: 'aug', trainer: 0 },
-      { month: 'sep', trainer: 0 }, { month: 'oct', trainer: 0 },
-      { month: 'nov', trainer: 0 }, { month: 'dec', trainer: 0 },
+        { month: 'jan', trainer: 0 }, { month: 'feb', trainer: 0 },
+        { month: 'mar', trainer: 0 }, { month: 'apr', trainer: 0 },
+        { month: 'may', trainer: 0 }, { month: 'jun', trainer: 0 },
+        { month: 'jul', trainer: 0 }, { month: 'aug', trainer: 0 },
+        { month: 'sep', trainer: 0 }, { month: 'oct', trainer: 0 },
+        { month: 'nov', trainer: 0 }, { month: 'dec', trainer: 0 },
     ];
-  
-    result.forEach(({ month, trainer }) => {
-      const index = allMonths.findIndex((m) => m.month === month);
-      if (index !== -1) {
-        allMonths[index].trainer = trainer;
-      }
-    });
-  
-    return allMonths;
-  };
 
-  
+    result.forEach(({ month, trainer }) => {
+        const index = allMonths.findIndex((m) => m.month === month);
+        if (index !== -1) {
+            allMonths[index].trainer = trainer;
+        }
+    });
+
+    return allMonths;
+};
+
+
 const getSingleTrainer = async (id: string): Promise<ITrainer | null> => {
 
     const result = await Trainer.findById(

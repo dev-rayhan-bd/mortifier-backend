@@ -3,8 +3,6 @@ import { Types } from "mongoose";
 export type IChat = {
     sender: Types.ObjectId; 
     receiver: Types.ObjectId;
-    senderType: 'Trainee' | 'Trainer';  
-    receiverType: 'Trainee' | 'Trainer';
     message: string;
 };
 

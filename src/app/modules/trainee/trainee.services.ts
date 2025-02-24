@@ -1,7 +1,12 @@
+import { JwtPayload, Secret } from "jsonwebtoken";
 import { IPaginationOptions } from "../../global/globalType";
 import { paginationHelpers } from "../../helpers/pagination";
+import { User } from "../users/user.model";
 import { ITrainee } from "./trainee.interface";
 import { Trainee } from "./trainee.model";
+import mongoose from "mongoose";
+import { createToken } from "../../helpers/jwtHelper";
+import config from "../../config";
 
 
 const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: any) => {
@@ -48,9 +53,13 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
 
 }
 
-const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>) => {
+const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>, user: any, userId: any) => {
     if (file) {
         data.profileImageUrl = `/uploads/${file.filename}`;
+    }
+    let userInfo = null;
+    if (user?.email) {
+       userInfo = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(String(userId.id)) }, user, { new: true })
     }
 
     const result = await Trainee.findByIdAndUpdate(
@@ -62,7 +71,22 @@ const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>) => 
             new: true
         }
     )
-    return result
+    const tokenPayload = {
+        email: userInfo?.email,
+        id: userInfo?._id,
+        role: userInfo?.role,
+        status: userInfo?.status
+    }
+
+    const accessToken = createToken(
+        tokenPayload,
+        config.jwt_access_secret as Secret,
+        config.jwt_access_expires_in as string,
+    )
+
+    return {
+        accessToken
+    }
 
 }
 
