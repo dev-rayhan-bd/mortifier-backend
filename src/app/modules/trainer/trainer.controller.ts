@@ -5,11 +5,12 @@ import { IPaginationOptions } from "../../global/globalType";
 const updateTriner = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const file = req?.file
+        const userId = req.user
         const id = req.params.id
         // const user = req.user
-        const data = JSON.parse(req.body.data)
-
-        const result = await trainerServices.updateTrainer(file,id, data);
+        const { trainer, user } = JSON.parse(req.body.data)
+    
+        const result = await trainerServices.updateTrainer(file,id, trainer, user, userId);
 
         res.status(200).json({
             success: true,

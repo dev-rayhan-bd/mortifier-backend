@@ -6,22 +6,23 @@ const traineeSchema: Schema<ITrainee> = new Schema({
     lastName: { type: String, required: true },
     address: {
         type: String,
-        required: true
     },
-    gender: { type: String, enum: ['male', 'female', 'others']},
-    contactNo: { type: String, required: true },
+    gender: { type: String, enum: ['male', 'female', 'others'] },
+    contactNo: { type: String },
     profileImageUrl: { type: String },
-    title: { type: String, required: false },
+    title: { type: String },
     userName: { type: String, required: true, unique: true },
-    dob: { type: Date, required: true },  // Use `Date` type if possible
-    country: { type: String, required: true },
-    city: { type: String, required: true },
-    height: { type: Number, required: true },
-    weight: { type: Number, required: true },
-    fitterGoal: { type: String, required: true },  // Enum can be added if predefined values are known
-    interest: { type: [String], required: true },
-    towardsGoal: { type: String, required: true },
-    achieveGoal: { type: String, required: true },
+    dob: { type: Date },  // Use `Date` type if possible
+    country: { type: String },
+    city: { type: String },
+    height: { type: Number },
+    heightMeasurement: { type: String },
+    weight: { type: Number },
+    weightMeasurement: { type: String },
+    fitterGoal: { type: String },  // Enum can be added if predefined values are known
+    interest: { type: [String] },
+    towardsGoal: { type: String },
+    achieveGoal: { type: String },
     TikTok: { type: String },
     Instagram: { type: String },
     Facebook: { type: String },
