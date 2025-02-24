@@ -50,12 +50,12 @@ export const traineeValidatedSchema = z.object({
     country: z.string({
         required_error: "Country is required",
         invalid_type_error: "Country must be a string",
-    }).min(1, "Country cannot be empty").optional(),
+    }).optional(),
 
     city: z.string({
         required_error: "City is required",
         invalid_type_error: "City must be a string",
-    }).min(1, "City cannot be empty").optional(),
+    }).optional(),
 
     height: z.number({
         invalid_type_error: "Height must be a number",
