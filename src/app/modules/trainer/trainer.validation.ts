@@ -12,6 +12,11 @@ export const trainerValidatedSchema = z.object({
         invalid_type_error: "Last name must be a string",
     }).min(1, "Last name cannot be empty"),
 
+    title: z.string({
+        required_error: "Last name is required",
+        invalid_type_error: "Last name must be a string",
+    }).optional(),
+
     gender: z.enum(['male', 'female', 'others'], {
         required_error: "Gender is required",
         invalid_type_error: "Gender must be 'male', 'female', or 'others'",

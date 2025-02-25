@@ -112,6 +112,36 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getAllContentForLogOutUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { limit, page, sortBy, sortOrder, searchTerm, role, ...filters } = req.query;
+
+        const paginationOptions = {
+            limit: Number(limit) || 10,
+            page: Number(page) || 1,
+            sortBy: sortBy?.toString() || 'createdAt',
+            sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
+        };
+
+
+        const result = await contentServices.getAllContentForLogOutUsers(paginationOptions,searchTerm as string,role, filters)
+        res.status(200).json({
+            success: true,
+            message: 'get all content successfully',
+            data: result,
+        })
+        // sendResponse(res, {
+        //     statusCode: httpStatus.OK,
+        //     success: true,
+        //     message: 'user created successfully',
+        //     data: result,
+        // });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 const getAllForAdminContent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = req.user
@@ -219,6 +249,7 @@ export const contentController = {
     createContent,
     getSingleContent,
     getMyContent,
+    getAllContentForLogOutUsers,
     getAllContent,
     getAllForAdminContent,
     updateContent,

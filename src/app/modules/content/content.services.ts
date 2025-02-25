@@ -229,6 +229,139 @@ const getAllContent = async (
 };
 
 
+const getAllContentForLogOutUsers = async (
+    paginationOptions: IPaginationOptions,
+    searchTerm: string,
+    role: any,
+    filtersData: any,
+
+): Promise<any> => {
+    const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
+
+
+    const andConditions = [];
+    const contentSearchableFields = ["title", "content", "specialism"];
+
+    if (searchTerm) {
+        andConditions.push({
+            $or: contentSearchableFields.map((field) => ({
+                [field]: {
+                    $regex: searchTerm,
+                    $options: "i",
+                },
+            })),
+        });
+    }
+
+    if (Object.keys(filtersData).length) {
+        andConditions.push({
+            $and: Object.entries(filtersData).map(([field, value]) => ({
+                [field]: value,
+            })),
+        });
+    }
+
+    const sortConditions: { [key: string]: 1 | -1 } = {};
+    if (sortBy && sortOrder) {
+        sortConditions[sortBy] = sortOrder === 'asc' || sortOrder === 'ascending' ? 1 : -1;
+    }
+
+    const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
+
+    const aggregationPipeline = [
+        { $match: whereConditions },
+        { $match: { status: { $ne: "blocked" } } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "userDetails",
+            },
+        },
+        { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "userDetails._id",
+                foreignField: "user",
+                as: "trainerDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "trainees",
+                localField: "userDetails._id",
+                foreignField: "user",
+                as: "traineeDetails",
+            },
+        },
+        { $match: role ? { "userDetails.role": role } : {} },
+        {
+            $lookup: {
+                from: "likes",
+                let: { contentId: "$_id" },
+                pipeline: [
+                    { 
+                        $match: { 
+                            $expr: { $eq: ["$contentId", "$$contentId"] }
+                        } 
+                    },
+                ],
+                as: "allLikes",
+            },
+        },
+        {
+            $addFields: {
+                userInfo: {
+                    $arrayElemAt: [{ $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0],
+                },
+                totalLikes: { $size: "$allLikes" },
+            },
+        },
+        {
+            $project: {
+                title: 1,
+                content: 1,
+                specialism: 1,
+                status: 1,
+                imageUrl: 1,
+                videoUrl: 1,
+                userId: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "userDetails.email": 1,
+                "userDetails.role": 1,
+                "userInfo.firstName": 1,
+                "userInfo.lastName": 1,
+                "userInfo._id": 1,
+                "userInfo.profileImageUrl": 1,
+                totalLikes: 1,
+            },
+        },
+        { $sort: sortConditions },
+    ];
+    const totalResult = await Content.aggregate([
+        ...aggregationPipeline,
+        { $count: "total" },
+    ]);
+    console.log(totalResult);
+
+    const total = totalResult.length > 0 ? totalResult[0].total : 0;
+
+    const result = await Content.aggregate([
+        ...aggregationPipeline,
+        { $skip: skip },
+        { $limit: limit },
+    ]);
+
+    return {
+        meta: { page, limit, total },
+        data: result,
+    };
+};
+
+
 const getAllForAdminContent = async (
     paginationOptions: IPaginationOptions,
     searchTerm: string,
@@ -451,6 +584,7 @@ export const contentServices = {
     getSingleContent,
     getMyContent,
     getAllContent,
+    getAllContentForLogOutUsers,
     getAllForAdminContent,
     updateContent,
     deleteContent,

@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 export interface ITrainer {
   firstName: string;
   lastName: string;
+  title?: string;
   gender?: 'male' | 'female' | 'others';
   contactNo?: string;
   profileImageUrl?: string;

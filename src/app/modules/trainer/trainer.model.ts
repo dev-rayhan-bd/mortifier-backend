@@ -11,6 +11,9 @@ const trainerSchema = new Schema<ITrainer>(
       type: String,
       required: true,
     },
+    title: {
+      type: String,
+    },
     gender: {
       type: String,
       enum: ['male', 'female', 'others'],

@@ -7,6 +7,7 @@ import { Trainee } from "./trainee.model";
 import mongoose from "mongoose";
 import { createToken } from "../../helpers/jwtHelper";
 import config from "../../config";
+import { uploadToCloudinary } from "../../helpers/fileUploader";
 
 
 const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: any) => {
@@ -54,6 +55,11 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
 }
 
 const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>, user: any, userId: any) => {
+    // console.log(file);
+    // const uploadedImage: any = await uploadToCloudinary(file)
+    // const imageUrl = uploadedImage.secure_url
+    // console.log(uploadedImage);
+    // console.log(imageUrl);
     if (file) {
         data.profileImageUrl = `/uploads/${file.filename}`;
     }
