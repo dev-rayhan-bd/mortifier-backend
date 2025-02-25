@@ -7,6 +7,7 @@ import { ENUM_USER_ROLE } from "../../enums/user";
 const router = Router();
 
 router.post('/create', auth(), upload.single('file'), contentController.createContent)
+router.get('/for-loggout-users', contentController.getAllContentForLogOutUsers)
 router.get('/', auth(), contentController.getAllContent)
 router.get('/admin', auth(ENUM_USER_ROLE.ADMIN,ENUM_USER_ROLE.SUPER_ADMIN), contentController.getAllForAdminContent)
 router.get('/my-content', auth(), contentController.getMyContent)

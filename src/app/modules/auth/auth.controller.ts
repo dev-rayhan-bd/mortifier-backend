@@ -10,7 +10,7 @@ const logInUser = async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken, ...others } = result
     const cookieOptions = {
       secure: config.node_env === 'production',
-      httpOnly: true,
+      httpOnly: false,
     }
 
     res.cookie('refreshToken', refreshToken, cookieOptions)
@@ -34,7 +34,7 @@ const logInAdmin = async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken, ...others } = result
     const cookieOptions = {
       secure: config.node_env === 'production',
-      httpOnly: true,
+      httpOnly: false,
     }
 
     res.cookie('refreshToken', refreshToken, cookieOptions)
@@ -58,7 +58,7 @@ const createRefreshToken = async (req: Request, res: Response, next: NextFunctio
 
     const cookieOptions = {
       secure: config.node_env === 'production',
-      httpOnly: true,
+      httpOnly: false,
     }
 
     res.cookie('refreshToken', refreshToken, cookieOptions)
