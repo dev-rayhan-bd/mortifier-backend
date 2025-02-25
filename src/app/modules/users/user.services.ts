@@ -71,7 +71,7 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
     }
 }
 
-const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerData: ITrainer, file: any, specialism: string[]): Promise<any> => {
+const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerData: any, file: any, specialism: string[]): Promise<any> => {
     const userData = {
         email: validateUserInfo?.email,
         password: validateUserInfo?.password,
