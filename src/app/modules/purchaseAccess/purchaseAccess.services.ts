@@ -20,7 +20,6 @@ const enrollNow = async (data: IPurchaseAccess): Promise<IPurchaseAccess> => {
     const session = await TrainingSession.findOne({
         _id: data?.session_id,})
 
-        console.log(session);
  
     const isExist = await PurchaseAccess.findOne({
         session_id: data?.session_id,

@@ -20,7 +20,6 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
         const content = trainingSessionValidatedSchema.parse(data)
         // console.log('file',file);
         // console.log('content',content);
-        console.log('user', user);
 
         const result = await sessionServices.createSession(image, video, user, content)
         res.status(200).json({
@@ -44,7 +43,6 @@ const getAllSession = async (req: Request, res: Response, next: NextFunction) =>
             sortBy: sortBy?.toString() || 'createdAt',
             sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'desc',
         };
-        console.log(paginationOptions);
 
         const result = await sessionServices.getAllSession(paginationOptions, searchTerm as string , filters)
         res.status(200).json({
@@ -68,7 +66,6 @@ const getAllSessionForAdmin = async (req: Request, res: Response, next: NextFunc
             sortBy: sortBy?.toString() || 'createdAt',
             sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'desc',
         };
-        console.log(paginationOptions);
 
         const result = await sessionServices.getAllSessionForAdmin(paginationOptions, searchTerm as string , filters)
         res.status(200).json({
@@ -113,7 +110,6 @@ const getMySession = async (req: Request, res: Response, next: NextFunction) => 
             sortBy: sortBy?.toString() || 'createdAt',
             sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'desc',
         };
-        console.log(paginationOptions);
 
         const result = await sessionServices.getMySession(trainerId ,paginationOptions, searchTerm as string , filters)
         res.status(200).json({

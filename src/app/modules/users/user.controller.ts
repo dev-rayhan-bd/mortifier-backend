@@ -11,7 +11,7 @@ const createTrainee = async (req: Request, res: Response, next: NextFunction) =>
         const file = req.file
         const data = JSON.parse(req.body.data)
         const { userInfo, traineeData } = data;
-        console.log("userInfo", userInfo, "traineeData", traineeData);
+
         const validateUserInfo = userValidationSchema.parse(userInfo)
         const validateTraineeData = traineeValidatedSchema.parse(traineeData)
         const result = await userServices.createTrainee(validateUserInfo, validateTraineeData, file);
@@ -76,7 +76,7 @@ const createTrainer = async (req: Request, res: Response, next: NextFunction) =>
 const getMe = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = req.user;
-        console.log(user);
+
         const result = await userServices.getMe(user);
         res.status(200).json({
             success: true,

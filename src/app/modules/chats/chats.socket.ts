@@ -5,7 +5,7 @@ const initialChats = (io: Server) => {
     const chatNamespace = io.of('/chats');
 
     chatNamespace.on('connection', (socket) => {
-        console.log('User connected:', socket.id);
+
 
         //receive using on send using emit
         socket.on("sendUser", async (data) => {

@@ -286,7 +286,7 @@ const blockUnblock = async (id: string): Promise<any> => {
     }
 
     const result = await TrainingSession.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
-    console.log(result);
+
     return {
         message: `session ${result?.status}`
     }

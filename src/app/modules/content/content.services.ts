@@ -360,7 +360,6 @@ const getAllContentForLogOutUsers = async (
         ...aggregationPipeline,
         { $count: "total" },
     ]);
-    console.log(totalResult);
 
     const total = totalResult.length > 0 ? totalResult[0].total : 0;
 
@@ -592,7 +591,7 @@ const blockUnblock = async (id: string): Promise<any> => {
     }
 
     const result = await Content.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
-    console.log(result);
+
     return {
         message: `content ${result?.status}`
     }
