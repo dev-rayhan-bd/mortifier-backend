@@ -1,4 +1,4 @@
-import { upload } from './../../helpers/fileUploader';
+import { upload, uploadToCloudinary } from './../../helpers/fileUploader';
 import AppError from '../../errors/AppError';
 import { Trainee } from '../trainee/trainee.model';
 import { ITrainee } from '../trainee/trainee.interface';
@@ -29,10 +29,13 @@ const createTrainee = async (validateUserInfo: Partial<IUser>, validateTraineeDa
     if (isExist) {
         throw new AppError(400, 'User already exists!')
     }
-
     if (file) {
-        validateTraineeData.profileImageUrl = `/uploads/${file?.filename}`;
+        const uploadedImage: any = await uploadToCloudinary(file)
+        validateTraineeData.profileImageUrl = uploadedImage.secure_url
     }
+    // if (file) {
+    //     validateTraineeData.profileImageUrl = `/uploads/${file.filename}`;
+    // }
 
     const result = await User.create(userData);
 
@@ -86,10 +89,14 @@ const createTrainer = async (validateUserInfo: Partial<IUser>, validateTrainerDa
     }
 
     const result = await User.create(userData);
-
     if (file) {
-        validateTrainerData.profileImageUrl = `/uploads/${file.filename}`;
+        const uploadedImage: any = await uploadToCloudinary(file)
+        validateTrainerData.profileImageUrl = uploadedImage.secure_url
     }
+
+    // if (file) {
+    //     validateTrainerData.profileImageUrl = `/uploads/${file.filename}`;
+    // }
 
     if (result?._id) {
         validateTrainerData.user = result?._id
