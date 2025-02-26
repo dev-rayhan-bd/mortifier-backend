@@ -8,13 +8,18 @@ import { Trainer } from "./trainer.model";
 import { createToken } from "../../helpers/jwtHelper";
 import config from "../../config";
 import { Secret } from "jsonwebtoken";
+import { uploadToCloudinary } from "../../helpers/fileUploader";
 
 
 const updateTrainer = async (file: any, id: string, data: Partial<ITrainer>, user: any, userId: any) => {
-
     if (file) {
-        data.profileImageUrl = `/uploads/${file.filename}`;
+        const uploadedImage: any = await uploadToCloudinary(file)
+        data.profileImageUrl = uploadedImage.secure_url
     }
+
+    // if (file) {
+    //     data.profileImageUrl = `/uploads/${file.filename}`;
+    // }
     let userInfo = null;
     if (user?.email) {
         userInfo = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(String(userId.id)) }, user, { new: true })

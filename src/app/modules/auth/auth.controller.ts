@@ -53,7 +53,7 @@ const logInAdmin = async (req: Request, res: Response, next: NextFunction) => {
 const createRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken  = req.cookies.refreshToken;
-    console.log('refresh', refreshToken)
+
     const result = await authServices.createRefreshToken(refreshToken)
 
     const cookieOptions = {
@@ -111,7 +111,7 @@ const changeAdminPassword = async (req: Request, res: Response, next: NextFuncti
 const forgetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
-    console.log(email);
+
     const result = await authServices.forgetPassword(email)
 
     res.status(200).json({

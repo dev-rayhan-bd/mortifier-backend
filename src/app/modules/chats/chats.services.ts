@@ -124,7 +124,7 @@ const getUserChats = async (data: any): Promise<IChat[]> => {
 }
 
 const getAdminChats = async (data: any) => {
-    console.log(data);
+
     const sender = data?.sender;
     const receiver = data?.receiver;
     const result = await ChatsAdmin.find({
@@ -139,7 +139,7 @@ const getAdminChats = async (data: any) => {
 };
 
 const getAlUserWithIChats = async (currentUserId: string) => {
-    console.log(currentUserId);
+
     try {
         const result = await Chats.aggregate([
             {

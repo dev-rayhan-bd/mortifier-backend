@@ -42,30 +42,30 @@ const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: 
         .skip(skip)
         .limit(limit)
     const total = await Trainee.countDocuments(whereConditions);
-    
-        return {
-            meta: {
-                page,
-                limit,
-                total,
-            },
-            data: result,
-        };
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+        },
+        data: result,
+    };
 
 }
 
 const updateTrainee = async (file: any, id: string, data: Partial<ITrainee>, user: any, userId: any) => {
-    // console.log(file);
-    // const uploadedImage: any = await uploadToCloudinary(file)
-    // const imageUrl = uploadedImage.secure_url
-    // console.log(uploadedImage);
-    // console.log(imageUrl);
+
     if (file) {
-        data.profileImageUrl = `/uploads/${file.filename}`;
+        const uploadedImage: any = await uploadToCloudinary(file)
+        data.profileImageUrl = uploadedImage.secure_url
     }
+    // if (file) {
+    //     data.profileImageUrl = `/uploads/${file.filename}`;
+    // }
     let userInfo = null;
     if (user?.email) {
-       userInfo = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(String(userId.id)) }, user, { new: true })
+        userInfo = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(String(userId.id)) }, user, { new: true })
     }
 
     const result = await Trainee.findByIdAndUpdate(
@@ -107,7 +107,7 @@ const getAllForAdminTrainee = async (
     const andConditions: any[] = [];
 
     const contentSearchableFields = ["firstName", "lastName"];
-   
+
     if (searchTerm) {
         andConditions.push({
             $or: contentSearchableFields.map((field) => ({
@@ -143,7 +143,7 @@ const getAllForAdminTrainee = async (
                 as: "userData",
             },
         },
-        
+
         {
             $unwind: {
                 path: "$userData",
@@ -185,50 +185,50 @@ const getAllForAdminTrainee = async (
 
 const getTraineesByMonth = async () => {
     const result = await Trainee.aggregate([
-      {
-        $group: {
-          _id: { $month: '$createdAt' },
-          user: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          month: {
-            $let: {
-              vars: {
-                months: [
-                  'jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                  'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
-                ],
-              },
-              in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
+        {
+            $group: {
+                _id: { $month: '$createdAt' },
+                user: { $sum: 1 },
             },
-          },
-          user: 1,
         },
-      },
+        {
+            $project: {
+                _id: 0,
+                month: {
+                    $let: {
+                        vars: {
+                            months: [
+                                'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                                'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+                            ],
+                        },
+                        in: { $arrayElemAt: ['$$months', { $subtract: ['$_id', 1] }] },
+                    },
+                },
+                user: 1,
+            },
+        },
     ]);
-  
+
 
     const allMonths = [
-      { month: 'jan', user: 0 }, { month: 'feb', user: 0 },
-      { month: 'mar', user: 0 }, { month: 'apr', user: 0 },
-      { month: 'may', user: 0 }, { month: 'jun', user: 0 },
-      { month: 'jul', user: 0 }, { month: 'aug', user: 0 },
-      { month: 'sep', user: 0 }, { month: 'oct', user: 0 },
-      { month: 'nov', user: 0 }, { month: 'dec', user: 0 },
+        { month: 'jan', user: 0 }, { month: 'feb', user: 0 },
+        { month: 'mar', user: 0 }, { month: 'apr', user: 0 },
+        { month: 'may', user: 0 }, { month: 'jun', user: 0 },
+        { month: 'jul', user: 0 }, { month: 'aug', user: 0 },
+        { month: 'sep', user: 0 }, { month: 'oct', user: 0 },
+        { month: 'nov', user: 0 }, { month: 'dec', user: 0 },
     ];
-  
+
     result.forEach(({ month, user }) => {
-      const index = allMonths.findIndex((m) => m.month === month);
-      if (index !== -1) {
-        allMonths[index].user = user;
-      }
+        const index = allMonths.findIndex((m) => m.month === month);
+        if (index !== -1) {
+            allMonths[index].user = user;
+        }
     });
-  
+
     return allMonths;
-  };
+};
 
 export const traineeServices = {
     getAllTrainee,

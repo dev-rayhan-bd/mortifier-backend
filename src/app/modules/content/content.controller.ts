@@ -10,7 +10,6 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
         const content = contentValidatedSchema.parse(data)
         // console.log('file',file);
         // console.log('content',content);
-        console.log('user', user);
 
         const result = await contentServices.createContent(file, content, user)
         res.status(200).json({
@@ -62,7 +61,7 @@ const getMyContent = async (req: Request, res: Response, next: NextFunction) => 
             sortBy: sortBy?.toString() || 'createdAt',
             sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
         };
-        console.log(paginationOptions);
+
         const result = await contentServices.getMyContent(user,paginationOptions, searchTerm)
         res.status(200).json({
             success: true,
@@ -92,7 +91,7 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
             sortBy: sortBy?.toString() || 'createdAt',
             sortOrder: sortOrder?.toString() === 'desc' ? 'desc' : 'asc',
         };
-        console.log(paginationOptions);
+
 
         const result = await contentServices.getAllContent(paginationOptions,searchTerm as string,role, filters, user)
         res.status(200).json({

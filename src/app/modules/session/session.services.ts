@@ -7,12 +7,19 @@ import { paginationHelpers } from "../../helpers/pagination";
 import mongoose from "mongoose";
 import { ITrainingSession } from "./session.interface";
 import AppError from "../../errors/AppError";
+import { uploadToCloudinary } from "../../helpers/fileUploader";
 
 
 const createSession = async (image: Express.Multer.File, video: Express.Multer.File, user: any, content: any) => {
 
-    content.promo_image = `/uploads/${image.filename}`;
-    content.promo_video = `/uploads/${video.filename}`;
+    const uploadedImage: any = await uploadToCloudinary(image)
+    content.promo_image = uploadedImage.secure_url
+
+    const uploadedVideo: any = await uploadToCloudinary(video)
+    content.promo_video = uploadedVideo.secure_url
+
+    // content.promo_image = `/uploads/${image.filename}`;
+    // content.promo_video = `/uploads/${video.filename}`;
     const isExistUser = await User.findOne({ email: user.email });
 
     if (!isExistUser) {
@@ -30,11 +37,19 @@ const createSession = async (image: Express.Multer.File, video: Express.Multer.F
 }
 
 const updateSession = async (id: string, file: any, user: any, content: any) => {
+    
+    const uploadedImage: any = await uploadToCloudinary(file)
+    // data.profileImageUrl = uploadedImage.secure_url
     const newVideo = {
         title: content.recordedContent.title,
-        url: `/uploads/${file.filename}`,
+        url: uploadedImage.secure_url,
         duration: content.recordedContent.duration,
     };
+    // const newVideo = {
+    //     title: content.recordedContent.title,
+    //     url: `/uploads/${file.filename}`,
+    //     duration: content.recordedContent.duration,
+    // };
 
     const result = await TrainingSession.findByIdAndUpdate(
         { _id: id },
@@ -271,7 +286,7 @@ const blockUnblock = async (id: string): Promise<any> => {
     }
 
     const result = await TrainingSession.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
-    console.log(result);
+
     return {
         message: `session ${result?.status}`
     }

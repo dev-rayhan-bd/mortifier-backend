@@ -6,21 +6,36 @@ import { Trainer } from "../trainer/trainer.model";
 import { Trainee } from "../trainee/trainee.model";
 import AppError from "../../errors/AppError";
 import { IPaginationOptions } from "../../global/globalType";
+import { uploadToCloudinary } from "../../helpers/fileUploader";
 
 
 const createContent = async (file: any, content: IContent, user: any): Promise<IContent> => {
-
     if (file) {
         if (file.mimetype.startsWith("image/")) {
-            content.imageUrl = `/uploads/${file.filename}`;
+            const uploadedImage: any = await uploadToCloudinary(file)
+            content.imageUrl = uploadedImage.secure_url
+            // content.imageUrl = `/uploads/${file.filename}`;
             content.userId = user?.id;
         } else if (file.mimetype.startsWith("video/")) {
-            content.videoUrl = `/uploads/${file.filename}`;
+            const uploadedImage: any = await uploadToCloudinary(file)
+            content.videoUrl = uploadedImage.secure_url
+            // content.videoUrl = `/uploads/${file.filename}`;
             content.userId = user?.id;
         } else {
             throw new Error("Invalid file type. Only images and videos are allowed.");
         }
     }
+    // if (file) {
+    //     if (file.mimetype.startsWith("image/")) {
+    //         content.imageUrl = `/uploads/${file.filename}`;
+    //         content.userId = user?.id;
+    //     } else if (file.mimetype.startsWith("video/")) {
+    //         content.videoUrl = `/uploads/${file.filename}`;
+    //         content.userId = user?.id;
+    //     } else {
+    //         throw new Error("Invalid file type. Only images and videos are allowed.");
+    //     }
+    // }
     const result = await Content.create(content)
     return result
 }
@@ -345,7 +360,6 @@ const getAllContentForLogOutUsers = async (
         ...aggregationPipeline,
         { $count: "total" },
     ]);
-    console.log(totalResult);
 
     const total = totalResult.length > 0 ? totalResult[0].total : 0;
 
@@ -521,10 +535,14 @@ const updateContent = async (file: any, content: IContent, user: any, id: string
 
     if (file) {
         if (file.mimetype.startsWith("image/")) {
-            content.imageUrl = `/uploads/${file.filename}`;
+            const uploadedImage: any = await uploadToCloudinary(file)
+            content.imageUrl = uploadedImage.secure_url
+            // content.imageUrl = `/uploads/${file.filename}`;
             content.userId = user?.id;
         } else if (file.mimetype.startsWith("video/")) {
-            content.videoUrl = `/uploads/${file.filename}`;
+            const uploadedImage: any = await uploadToCloudinary(file)
+            content.videoUrl = uploadedImage.secure_url
+            // content.videoUrl = `/uploads/${file.filename}`;
             content.userId = user?.id;
         } else {
             throw new Error("Invalid file type. Only images and videos are allowed.");
@@ -573,7 +591,7 @@ const blockUnblock = async (id: string): Promise<any> => {
     }
 
     const result = await Content.findByIdAndUpdate({ _id: id }, uploadedStatus, { new: true })
-    console.log(result);
+
     return {
         message: `content ${result?.status}`
     }
