@@ -38,7 +38,7 @@ export const trainingSessionValidatedSchema = z.object({
     status: z.enum(["in-progress", "blocked"], {
         required_error: "Status is required",
         invalid_type_error: "Status must be 'in-progress' or 'blocked'",
-    }),
+    }).optional(),
 
     fitnessFocus: z.string({
         required_error: "Fitness focus is required",
