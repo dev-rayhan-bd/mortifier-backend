@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 export type ITrainee = {
     firstName: string;
     lastName: string;
+    gymMember?: string;
     address?: string;
     gender?: 'male' | 'female' | 'others';
     contactNo?: string;

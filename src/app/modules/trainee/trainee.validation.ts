@@ -13,6 +13,11 @@ export const traineeValidatedSchema = z.object({
         invalid_type_error: "Last name must be a string",
     }).min(1, "Last name cannot be empty"),
 
+    gymMember: z.string({
+        required_error: "Member of a gym is required",
+        invalid_type_error: "Member of a gym must be a string",
+    }).optional(),
+
     address: z.string({
         required_error: "Address is required",
         invalid_type_error: "Address must be a string",
