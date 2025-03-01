@@ -4,6 +4,7 @@ import { ITrainee } from "./trainee.interface";
 const traineeSchema: Schema<ITrainee> = new Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
+    gymMember: { type: String },
     address: {
         type: String,
     },

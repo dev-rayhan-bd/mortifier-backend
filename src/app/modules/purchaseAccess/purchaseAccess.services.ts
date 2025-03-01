@@ -18,9 +18,10 @@ const checkEnrollment = async (data: IPurchaseAccess): Promise<{ enrolled: boole
 
 const enrollNow = async (data: IPurchaseAccess): Promise<IPurchaseAccess> => {
     const session = await TrainingSession.findOne({
-        _id: data?.session_id,})
+        _id: data?.session_id,
+    })
 
- 
+
     const isExist = await PurchaseAccess.findOne({
         session_id: data?.session_id,
         user_id: data?.user_id,
@@ -117,7 +118,7 @@ const getTotalEnrollment = async (sessionId: string) => {
 const getTotalEnrollmentForTrainer = async (trainerId: any) => {
     const result = await PurchaseAccess.aggregate([
         { $match: { trainer_id: new mongoose.Types.ObjectId(String(trainerId)) } },
-        { $count: "totalMembers"}
+        { $count: "totalMembers" }
     ]);
     return result.length > 0 ? result : [{ totalMembers: 0 }];
 }
@@ -131,6 +132,42 @@ const myMemberships = async (user: any) => {
     return result.length > 0 ? result : [{ totalMembership: 0 }];
 };
 
+const markVideoAsComplete = async (data: any): Promise<IPurchaseAccess | null> => {
+    const purchase = await PurchaseAccess.findOne({
+        session_id: data?.session_id,
+        user_id: data?.user_id,
+    });
+
+    if (!purchase) {
+        throw new AppError(400, 'Session not found for this user.');
+    }
+
+    if (purchase.completedVideos.includes(data?.video_id)) {
+        throw new AppError(400, "Video already marked as completed.");
+    }
+
+    purchase.completedVideos.push(data?.video_id);
+
+    const session = await TrainingSession.findById(data?.session_id);
+    if (!session) {
+        throw new AppError(400, "Session not found.");
+    }
+
+    const totalVideos = session.recordedContent?.length || 0;
+    const sessionCompleted = purchase.completedVideos.length >= totalVideos;
+
+    const updatedPurchase = await PurchaseAccess.findByIdAndUpdate(
+        purchase._id, 
+        {
+            completedVideos: purchase.completedVideos,
+            sessionCompleted: sessionCompleted
+        },
+        { new: true }
+    );
+
+
+    return updatedPurchase;
+};
 
 
 export const purchaseAccessServices = {
@@ -140,4 +177,5 @@ export const purchaseAccessServices = {
     getTotalEnrollment,
     getTotalEnrollmentForTrainer,
     myMemberships,
+    markVideoAsComplete,
 }

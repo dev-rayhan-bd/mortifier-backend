@@ -100,6 +100,26 @@ const myMemberships = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const markVideoAsComplete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const data = req.body
+        // const user = req.user
+        // const id = req.params.id
+
+        // console.log(id);
+        const result = await purchaseAccessServices.markVideoAsComplete(data);
+
+        res.status(200).json({
+            success: true,
+            message: 'mark as a complete successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 
 export const purchaseAccessController = {
     checkEnrollment,
@@ -108,4 +128,5 @@ export const purchaseAccessController = {
     getTotalEnrollment,
     getTotalEnrollmentForTrainer,
     myMemberships,
+    markVideoAsComplete,
 }
