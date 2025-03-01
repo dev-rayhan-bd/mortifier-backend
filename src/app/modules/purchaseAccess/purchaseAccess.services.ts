@@ -142,8 +142,6 @@ const markVideoAsComplete = async (data: any): Promise<IPurchaseAccess | null> =
         throw new AppError(400, 'Session not found for this user.');
     }
 
-    console.log("Existing Purchase:", purchase);
-
     if (purchase.completedVideos.includes(data?.video_id)) {
         throw new AppError(400, "Video already marked as completed.");
     }
@@ -167,7 +165,6 @@ const markVideoAsComplete = async (data: any): Promise<IPurchaseAccess | null> =
         { new: true }
     );
 
-    console.log("Updated Purchase:", updatedPurchase);
 
     return updatedPurchase;
 };

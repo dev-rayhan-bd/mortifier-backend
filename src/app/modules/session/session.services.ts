@@ -37,7 +37,7 @@ const createSession = async (image: Express.Multer.File, video: Express.Multer.F
 }
 
 const updateSession = async (id: string, file: any, user: any, content: any) => {
-    
+
     const uploadedImage: any = await uploadToCloudinary(file)
     // data.profileImageUrl = uploadedImage.secure_url
     const newVideo = {
@@ -105,6 +105,63 @@ const getAllSession = async (
     const result = await TrainingSession.aggregate([
         { $match: whereConditions },
         { $match: { status: { $ne: "blocked" } } },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "trainer_id",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            name: { $concat: ["$firstName", " ", "$lastName"] },
+                            profileImageUrl: 1,
+                            onlineSession: 1,
+                            faceToFace: 1,
+                            consultationType: 1,
+                            qualification: 1
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            $lookup: {
+                from: "sessionreviews",
+                localField: "_id",
+                foreignField: "session_id",
+                as: "reviews",
+            },
+        },
+        {
+            $unwind: {
+                path: "$reviews",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                trainer_id: { $first: "$trainer_id" },
+                owner: { $first: "$owner" }, // <-- Include owner in group
+                sessionType: { $first: "$sessionType" },
+                sessionMode: { $first: "$sessionMode" },
+                fitnessFocus: { $first: "$fitnessFocus" },
+                otherFocus: { $first: "$otherFocus" },
+                accessType: { $first: "$accessType" },
+                frequency: { $first: "$frequency" },
+                membership_fee: { $first: "$membership_fee" },
+                promo_image: { $first: "$promo_image" },
+                promo_video: { $first: "$promo_video" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                status: { $first: "$status" },
+                totalReviews: { $sum: { $cond: [{ $ifNull: ["$reviews.rating", false] }, 1, 0] } },
+                averageRating: { $avg: "$reviews.rating" }
+            }
+        },
         { $sort: sortConditions },
         { $skip: skip },
         { $limit: limit },
@@ -113,7 +170,9 @@ const getAllSession = async (
                 recordedContent: 0
             }
         }
-    ])
+    ]);
+
+
     const total = totalResult.length > 0 ? totalResult[0].total : 0;
 
 
