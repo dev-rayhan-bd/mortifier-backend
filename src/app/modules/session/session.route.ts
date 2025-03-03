@@ -15,6 +15,7 @@ router.post('/create', auth(),
     router.get('/admin', auth(ENUM_USER_ROLE.ADMIN,ENUM_USER_ROLE.SUPER_ADMIN), sessionController.getAllSessionForAdmin)
     router.get('/:id', auth(), sessionController.getMySession)
     router.get('/single/:id', auth(), sessionController.getSingleSession)
+    router.get('/admin/single/:id', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), sessionController.getSingleForAdminSession)
     router.patch('/:id', auth(), upload.single('file'), sessionController.updateSession)
     router.patch('/block-unblock/:id', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), upload.single('file'), sessionController.blockUnblock)
     router.delete('/delete-video', auth(), sessionController.deleteSessionContent)

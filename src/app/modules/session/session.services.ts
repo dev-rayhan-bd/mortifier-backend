@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { ITrainingSession } from "./session.interface";
 import AppError from "../../errors/AppError";
 import { uploadToCloudinary } from "../../helpers/fileUploader";
+import { PurchaseAccess } from "../purchaseAccess/purchaseAccess.model";
 
 
 const createSession = async (image: Express.Multer.File, video: Express.Multer.File, user: any, content: any) => {
@@ -226,6 +227,64 @@ const getAllSessionForAdmin = async (
     ]);
     const result = await TrainingSession.aggregate([
         { $match: whereConditions },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "trainer_id",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            name: { $concat: ["$firstName", " ", "$lastName"] },
+                            profileImageUrl: 1,
+                            onlineSession: 1,
+                            faceToFace: 1,
+                            consultationType: 1,
+                            qualification: 1
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            $lookup: {
+                from: "sessionreviews",
+                localField: "_id",
+                foreignField: "session_id",
+                as: "reviews",
+            },
+        },
+        {
+            $unwind: {
+                path: "$reviews",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                trainer_id: { $first: "$trainer_id" },
+                owner: { $first: "$owner" },
+                sessionType: { $first: "$sessionType" },
+                title: { $first: "$title" },
+                sessionMode: { $first: "$sessionMode" },
+                fitnessFocus: { $first: "$fitnessFocus" },
+                otherFocus: { $first: "$otherFocus" },
+                accessType: { $first: "$accessType" },
+                frequency: { $first: "$frequency" },
+                membership_fee: { $first: "$membership_fee" },
+                promo_image: { $first: "$promo_image" },
+                promo_video: { $first: "$promo_video" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                status: { $first: "$status" },
+                totalReviews: { $sum: { $cond: [{ $ifNull: ["$reviews.rating", false] }, 1, 0] } },
+                averageRating: { $avg: "$reviews.rating" }
+            }
+        },
         { $sort: sortConditions },
         { $skip: skip },
         { $limit: limit },
@@ -367,10 +426,42 @@ const getMySession = async (
 
 const getSingleSession = async (
     id: string,
+    userId: string,
+): Promise<ITrainingSession | null> => {
+    const result = await TrainingSession.findById({ _id: new mongoose.Types.ObjectId(id) }).lean();
+    if (!result) return null;
+
+    // Ensure recordedContent is always an array
+    result.recordedContent = result.recordedContent || [];
+
+    // Fetch completed videos for the user if userId is provided
+    let completedVideosSet = new Set();
+    if (userId) {
+        const purchase = await PurchaseAccess.findOne({
+            session_id: new mongoose.Types.ObjectId(id),
+            user_id: new mongoose.Types.ObjectId(userId)
+        }).lean();
+
+        if (purchase && purchase.completedVideos) {
+            completedVideosSet = new Set(purchase.completedVideos.map(videoId => videoId.toString()));
+        }
+    }
+
+    result.recordedContent = result.recordedContent.map(video => ({
+        ...video,
+        completed: completedVideosSet.has(video._id?.toString() || "")
+    }));
+
+    return result;
+};
+
+const getSingleForAdminSession = async (
+    id: string,
 ): Promise<ITrainingSession | null> => {
     const result = await TrainingSession.findById({ _id: new mongoose.Types.ObjectId(id) })
     return result
 };
+
 
 const deleteSessionContent = async (
     data: any
@@ -419,6 +510,7 @@ export const sessionServices = {
     updateSession,
     getMySession,
     getSingleSession,
+    getSingleForAdminSession,
     deleteSessionContent,
     deleteWholeSession,
     blockUnblock,

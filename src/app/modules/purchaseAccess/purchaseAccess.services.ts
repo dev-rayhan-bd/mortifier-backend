@@ -6,14 +6,17 @@ import mongoose from "mongoose";
 import { TrainingSession } from "../session/session.model";
 
 
-const checkEnrollment = async (data: IPurchaseAccess): Promise<{ enrolled: boolean }> => {
+const checkEnrollment = async (data: IPurchaseAccess): Promise<{ enrolled: boolean; result: IPurchaseAccess | null }>=> {
 
     const result = await PurchaseAccess.findOne({
         session_id: data?.session_id,
         user_id: data?.user_id,
     })
 
-    return result ? { enrolled: true } : { enrolled: false };
+    return {
+        enrolled: !!result,
+        result: result ? result : null,
+    };
 }
 
 const enrollNow = async (data: IPurchaseAccess): Promise<IPurchaseAccess> => {
@@ -46,15 +49,58 @@ const myEnrolledSesion = async (data: JwtPayload | null) => {
                 from: "trainingsessions",
                 localField: "session_id",
                 foreignField: "_id",
-                as: "sessionDetails"
+                as: "sessionDetails",
+            }
+        },
+        { $unwind: { path: "$sessionDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "sessionDetails.trainer_id",
+                foreignField: "_id",
+                as: "owner"
+            }
+        },
+        { $unwind: { path: "$owner", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "sessionreviews",
+                localField: "session_id",
+                foreignField: "session_id",
+                as: "reviews",
+            },
+        },
+        { $unwind: { path: "$reviews", preserveNullAndEmptyArrays: true } },
+        {
+            $group: {
+                _id: "$_id",
+                session_id: { $first: "$session_id" },
+                trainer_id: { $first: "$trainer_id" },
+                user_id: { $first: "$user_id" },
+                purchaseDate: { $first: "$purchaseDate" },
+                paymentStatus: { $first: "$paymentStatus" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                sessionDetails: { $first: "$sessionDetails" },
+                owner: {
+                    $first: {
+                        name: { $concat: ["$owner.firstName", " ", "$owner.lastName"] },
+                        profileImageUrl: "$owner.profileImageUrl",
+                        onlineSession: "$owner.onlineSession",
+                        faceToFace: "$owner.faceToFace",
+                        consultationType: "$owner.consultationType"
+                    }
+                },
+                totalReviews: { $sum: { $cond: [{ $ifNull: ["$reviews.rating", false] }, 1, 0] } },
+                averageRating: { $avg: { $ifNull: ["$reviews.rating", 0] } }
             }
         },
         {
             $project: {
-                "sessionDetails.recordedContent": 0
+                "sessionDetails.recordedContent": 0,
+                "sessionDetails.trainer_id": 0
             }
-        },
-        { $unwind: "$sessionDetails" }
+        }
     ])
 
     return session;
@@ -157,7 +203,7 @@ const markVideoAsComplete = async (data: any): Promise<IPurchaseAccess | null> =
     const sessionCompleted = purchase.completedVideos.length >= totalVideos;
 
     const updatedPurchase = await PurchaseAccess.findByIdAndUpdate(
-        purchase._id, 
+        purchase._id,
         {
             completedVideos: purchase.completedVideos,
             sessionCompleted: sessionCompleted
