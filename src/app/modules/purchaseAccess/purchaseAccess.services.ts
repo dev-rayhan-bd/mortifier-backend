@@ -6,14 +6,17 @@ import mongoose from "mongoose";
 import { TrainingSession } from "../session/session.model";
 
 
-const checkEnrollment = async (data: IPurchaseAccess): Promise<{ enrolled: boolean }> => {
+const checkEnrollment = async (data: IPurchaseAccess): Promise<{ enrolled: boolean; result: IPurchaseAccess | null }>=> {
 
     const result = await PurchaseAccess.findOne({
         session_id: data?.session_id,
         user_id: data?.user_id,
     })
 
-    return result ? { enrolled: true } : { enrolled: false };
+    return {
+        enrolled: !!result,
+        result: result ? result : null,
+    };
 }
 
 const enrollNow = async (data: IPurchaseAccess): Promise<IPurchaseAccess> => {

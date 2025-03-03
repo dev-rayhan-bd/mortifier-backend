@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { trainingSessionValidatedSchema } from "./session.validation"
 import { sessionServices } from "./session.services"
+import AppError from "../../errors/AppError";
 
 
 const createSession = async (req: Request, res: Response, next: NextFunction) => {
@@ -126,7 +127,27 @@ const getMySession = async (req: Request, res: Response, next: NextFunction) => 
 const getSingleSession = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id
-        const result = await sessionServices.getSingleSession(id)
+        if (!req.user) {
+            throw new AppError(401,"User is not authenticated.");
+        }
+        const userId = req.user.id;
+        const result = await sessionServices.getSingleSession(id, userId)
+        res.status(200).json({
+            success: true,
+            message: 'get single session successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const getSingleForAdminSession = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+
+        const result = await sessionServices.getSingleForAdminSession(id)
         res.status(200).json({
             success: true,
             message: 'get single session successfully',
@@ -190,6 +211,7 @@ export const sessionController = {
     updateSession,
     getMySession,
     getSingleSession,
+    getSingleForAdminSession,
     deleteSessionContent,
     deleteWholeSession,
     blockUnblock,

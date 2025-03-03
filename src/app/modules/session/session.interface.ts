@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 interface Video {
+    _id: any;
     title: string;
     url: string;
     duration: string;
