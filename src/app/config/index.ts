@@ -13,4 +13,7 @@ export default {
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
   jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
   jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
+  payment_client_id: process.env.PAYPAL_CLIENT_ID,
+  payment_secret: process.env.PAYPAL_SECRET,
+  admin_paypal_email: process.env.ADMIN_PAYPAL_EMAIL,
 }

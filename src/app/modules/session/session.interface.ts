@@ -17,7 +17,7 @@ export interface ITrainingSession {
     otherFocus?: string;
     recordedContent?: Video[];
     accessType: "free" | "membership" | "followers";
-    frequency: "weekly" | "fortnightly" | "monthly";
+    frequency?: "weekly" | "fortnightly" | "monthly";
     membership_fee?: number;
     promo_image?: string;
     promo_video?: string;

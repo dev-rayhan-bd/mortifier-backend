@@ -60,7 +60,7 @@ export const trainingSessionValidatedSchema = z.object({
     frequency: z.enum(["weekly", "fortnightly", "monthly"], {
         required_error: "Frequency is required",
         invalid_type_error: "Frequency must be 'weekly' or 'monthly'",
-    }),
+    }).optional(),
 
     membership_fee: z.number({
         required_error: "Membership fee is required",

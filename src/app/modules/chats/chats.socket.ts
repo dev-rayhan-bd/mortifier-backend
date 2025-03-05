@@ -2,19 +2,19 @@ import { Server } from "socket.io";
 import { messageServices } from "./chats.services";
 
 const initialChats = (io: Server) => {
-    const chatNamespace = io.of('/chats');
+    const chatNamespace = io.of('/live-chats');
 
     chatNamespace.on('connection', (socket) => {
 
-
+        console.log(`User connected: ${socket.id}`);
         //receive using on send using emit
         socket.on("sendUser", async (data) => {
             try {
                 const dbMessage = await messageServices.createMessage(data);
-                    console.log(dbMessage);
+                    console.log('after db',dbMessage);
                 if (dbMessage) {
-                    socket.emit(`received${dbMessage?.sender}`, { message: dbMessage });
-                    socket.emit(`received${dbMessage?.receiver}`, { message: dbMessage });
+                    socket.emit(`received${dbMessage?.sender}`, dbMessage );
+                    socket.emit(`received${dbMessage?.receiver}`, dbMessage);
                 } else {
                     console.error("Message missing!");
                 }
