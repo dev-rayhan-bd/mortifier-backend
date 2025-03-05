@@ -17,6 +17,7 @@ import { CommentsRouter } from "../modules/comments/comments.route";
 import { PolicyAndTemrmsRouter } from "../modules/policyAndTerms/policyAndTerms.route";
 import { PurchaseAccessRouter } from "../modules/purchaseAccess/purchaseAccess.route";
 import { SessionReviewRouter } from "../modules/sessinReview/sessinReview.route";
+import { PaymentRouter } from "../modules/payment/payment.route";
 
 const router = Router();
 
@@ -92,6 +93,10 @@ const moduleRoutes = [
     {
         path: '/chats',
         route: ChatsRouter,
+    },
+    {
+        path: '/payment',
+        route: PaymentRouter,
     },
 ];
 

@@ -4,105 +4,99 @@ import { Chats, ChatsAdmin } from "./chats.model"
 
 
 const createMessage = async (data: IChat): Promise<any> => {
-    console.log('service', data);
 
-    // নতুন মেসেজ তৈরি করা
     const result = await Chats.create(data);
+    return result;
+    // const populatedMessage = await Chats.aggregate([
+    //     {
+    //         $match: { _id: result._id }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: "trainers", // Trainer collection
+    //             localField: "sender",
+    //             foreignField: "_id",
+    //             as: "senderTrainerInfo"
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: "trainees", // Trainee collection
+    //             localField: "sender",
+    //             foreignField: "_id",
+    //             as: "senderTraineeInfo"
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: "trainers",
+    //             localField: "receiver",
+    //             foreignField: "_id",
+    //             as: "receiverTrainerInfo"
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: "trainees",
+    //             localField: "receiver",
+    //             foreignField: "_id",
+    //             as: "receiverTraineeInfo"
+    //         }
+    //     },
+    //     {
+    //         $addFields: {
+    //             senderInfo: {
+    //                 $arrayElemAt: [
+    //                     { $concatArrays: ["$senderTrainerInfo", "$senderTraineeInfo"] },
+    //                     0
+    //                 ]
+    //             },
+    //             receiverInfo: {
+    //                 $arrayElemAt: [
+    //                     { $concatArrays: ["$receiverTrainerInfo", "$receiverTraineeInfo"] },
+    //                     0
+    //                 ]
+    //             }
+    //         }
+    //     },
+    //     {
+    //         $project: {
+    //             _id: 1,
+    //             message: 1,
+    //             createdAt: 1,
+    //             updatedAt: 1,
+    //             sender: {
+    //                 _id: "$senderInfo._id",
+    //                 firstName: "$senderInfo.firstName",
+    //                 lastName: "$senderInfo.lastName",
+    //                 profileImage: "$senderInfo.profileImageUrl",
+    //                 role: {
+    //                     $cond: {
+    //                         if: { $gt: [{ $size: "$senderTrainerInfo" }, 0] },
+    //                         then: "Trainer",
+    //                         else: "Trainee"
+    //                     }
+    //                 }
+    //             },
+    //             receiver: {
+    //                 _id: "$receiverInfo._id",
+    //                 firstName: "$receiverInfo.firstName",
+    //                 lastName: "$receiverInfo.lastName",
+    //                 profileImage: "$receiverInfo.profileImageUrl",
+    //                 role: {
+    //                     $cond: {
+    //                         if: { $gt: [{ $size: "$receiverTrainerInfo" }, 0] },
+    //                         then: "Trainer",
+    //                         else: "Trainee"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // ]);
 
-    // Trainer এবং Trainee থেকে sender ও receiver এর তথ্য আনতে aggregate ব্যবহার
-    const populatedMessage = await Chats.aggregate([
-        {
-            $match: { _id: result._id }
-        },
-        {
-            $lookup: {
-                from: "trainers", // Trainer collection
-                localField: "sender",
-                foreignField: "_id",
-                as: "senderTrainerInfo"
-            }
-        },
-        {
-            $lookup: {
-                from: "trainees", // Trainee collection
-                localField: "sender",
-                foreignField: "_id",
-                as: "senderTraineeInfo"
-            }
-        },
-        {
-            $lookup: {
-                from: "trainers",
-                localField: "receiver",
-                foreignField: "_id",
-                as: "receiverTrainerInfo"
-            }
-        },
-        {
-            $lookup: {
-                from: "trainees",
-                localField: "receiver",
-                foreignField: "_id",
-                as: "receiverTraineeInfo"
-            }
-        },
-        {
-            $addFields: {
-                senderInfo: { $concatArrays: ["$senderTrainerInfo", "$senderTraineeInfo"] },
-                receiverInfo: { $concatArrays: ["$receiverTrainerInfo", "$receiverTraineeInfo"] }
-            }
-        },
-        {
-            $unwind: {
-                path: "$senderInfo",
-                preserveNullAndEmptyArrays: true
-            }
-        },
-        {
-            $unwind: {
-                path: "$receiverInfo",
-                preserveNullAndEmptyArrays: true
-            }
-        },
-        {
-            $project: {
-                _id: 1,
-                message: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                sender: {
-                    _id: "$senderInfo._id",
-                    firstName: "$senderInfo.firstName",
-                    lastName: "$senderInfo.lastName",
-                    email: "$senderInfo.profileImageUrl",
-                    profilePic: "$senderInfo.profilePic",
-                    role: {
-                        $cond: {
-                            if: { $gt: [{ $size: "$senderTrainerInfo" }, 0] },
-                            then: "Trainer",
-                            else: "Trainee"
-                        }
-                    }
-                },
-                receiver: {
-                    _id: "$receiverInfo._id",
-                    firstName: "$receiverInfo.firstName",
-                    lastName: "$receiverInfo.lastName",
-                    email: "$receiverInfo.profileImageUrl",
-                    profilePic: "$receiverInfo.profilePic",
-                    role: {
-                        $cond: {
-                            if: { $gt: [{ $size: "$receiverTrainerInfo" }, 0] },
-                            then: "Trainer",
-                            else: "Trainee"
-                        }
-                    }
-                }
-            }
-        }
-    ]);
-
-    return populatedMessage.length > 0 ? populatedMessage[0] : result;
+    // console.log('final data', populatedMessage);
+    // return populatedMessage.length > 0 ? populatedMessage[0] : result;
 };
 
 
@@ -139,7 +133,6 @@ const getAdminChats = async (data: any) => {
 };
 
 const getAlUserWithIChats = async (currentUserId: string) => {
-
     try {
         const result = await Chats.aggregate([
             {
@@ -150,54 +143,64 @@ const getAlUserWithIChats = async (currentUserId: string) => {
                     ],
                 },
             },
-            // {
-            //     $project: {
-            //         otherUser: {
-            //             $cond: {
-            //                 if: { $eq: ["$sender", new Types.ObjectId(currentUserId)] },
-            //                 then: "$receiver",
-            //                 else: "$sender",
-            //             },
-            //         },
-            //         message: 1,
-            //         createdAt: 1,
-            //     },
-            // },
-            // {
-            //     $sort: { createdAt: -1 },
-            // },
-            // {
-            //     $group: {
-            //         _id: "$otherUser",
-            //         lastMessage: { $first: "$message" },
-            //         lastMessageDate: { $first: "$createdAt" },
-            //     },
-            // },
-            // {
-            //     $lookup: {
-            //         from: "customers",
-            //         localField: "_id",
-            //         foreignField: "_id",
-            //         as: "userDetails",
-            //     },
-            // },
-            // {
-            //     $unwind: "$userDetails",
-            // },
-            // {
-            //     $project: {
-            //         _id: 1,
-            //         firstName: "$userDetails.firstName",
-            //         lastName: "$userDetails.lastName",
-            //         contactNo: "$userDetails.contactNo",
-            //         profileImageUrl: "$userDetails.profileImageUrl",
-            //         lastMessage: 1,
-            //         lastMessageDate: 1,
-            //     },
-            // },
-            // {
-            //     $sort: { lastMessageDate: -1 },
-            // },
+            {
+                $sort: { createdAt: -1 }, // Sort messages to get the latest first
+            },
+            {
+                $group: {
+                    _id: {
+                        $cond: {
+                            if: { $eq: ["$sender", new mongoose.Types.ObjectId(currentUserId)] },
+                            then: "$receiver",
+                            else: "$sender",
+                        },
+                    },
+                    lastMessage: { $first: "$message" },
+                    lastMessageDate: { $first: "$createdAt" },
+                },
+            },
+            {
+                $lookup: {
+                    from: "trainers",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "trainerDetails",
+                },
+            },
+            {
+                $lookup: {
+                    from: "trainees",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "traineeDetails",
+                },
+            },
+            {
+                $addFields: {
+                    userDetails: {
+                        $arrayElemAt: [
+                            { $concatArrays: ["$trainerDetails", "$traineeDetails"] },
+                            0,
+                        ],
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    traineeTrainerId: "$userDetails._id",
+                    userId: "$userDetails.user",
+                    firstName: "$userDetails.firstName",
+                    lastName: "$userDetails.lastName",
+                    contactNo: "$userDetails.contactNo",
+                    profileImageUrl: "$userDetails.profileImageUrl",
+                    lastMessage: 1,
+                    lastMessageDate: 1,
+                },
+            },
+            {
+                $sort: { lastMessageDate: -1 }, // Sort by most recent conversation
+            },
         ]);
 
         return result;
@@ -206,7 +209,7 @@ const getAlUserWithIChats = async (currentUserId: string) => {
         console.error("Error fetching chat users:", error);
         throw error;
     }
-}
+};
 
 
 export const messageServices = {

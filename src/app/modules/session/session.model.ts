@@ -19,7 +19,7 @@ const trainingSessionSchema: Schema<ITrainingSession> = new Schema({
     otherFocus: { type: String },
     recordedContent: { type: [videoSchema] }, 
     accessType: { type: String, enum: ["free", "membership", "followers"], required: true },
-    frequency: { type: String, enum: ["weekly", "fortnightly", "monthly"], required: true },
+    frequency: { type: String, enum: ["weekly", "fortnightly", "monthly"] },
     membership_fee: { type: Number },
     promo_image: { type: String },
     promo_video: { type: String },
