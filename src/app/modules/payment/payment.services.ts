@@ -16,7 +16,7 @@ const makePayment = async (data: any) => {
     const adminCommission = (sessionPrice * 0.10).toFixed(2);
     const trainerPayout = (sessionPrice * 0.90).toFixed(2);
 
-    const create_payment_json = {
+    const create_payment_json:any = {
         intent: "sale",
         payer: {
             payment_method: "paypal",
@@ -47,7 +47,6 @@ const makePayment = async (data: any) => {
             return { approvalUrl }
         }
     });
-
 }
 
 const executePayment = async (data: any) => {

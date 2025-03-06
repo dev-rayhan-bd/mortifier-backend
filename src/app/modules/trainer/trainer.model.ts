@@ -37,6 +37,9 @@ const trainerSchema = new Schema<ITrainer>(
     zipCode: {
       type: Number,
     },
+    earning: {
+      type: Number,
+    },
     about: {
       type: String,
     },

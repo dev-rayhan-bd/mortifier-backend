@@ -52,6 +52,10 @@ export const trainerValidatedSchema = z.object({
         invalid_type_error: "Zip code must be a number",
     }).optional(),
 
+    earning: z.number({
+        invalid_type_error: "earning  must be a number",
+    }).optional(),
+
     about: z.string({
         required_error: "About information is required",
         invalid_type_error: "About must be a string",
