@@ -11,6 +11,7 @@ export interface ITrainer {
   userName: string;
   country?: string;
   zipCode?: number;
+  earning?: number;
   about?: string;
   onlineSession?: 'yes' | 'no';
   faceToFace?: 'yes' | 'no';

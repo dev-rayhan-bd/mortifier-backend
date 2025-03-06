@@ -106,7 +106,20 @@ const getAllTrainer = async (paginationOptions: IPaginationOptions, searchTerm: 
                 as: "allSpecialism",
             },
         },
-
+        {
+            $lookup: {
+                from: "sessionreviews",
+                localField: "user",
+                foreignField: "user_id",
+                as: "reviews",
+            },
+        },
+        {
+            $addFields: {
+                averageRating: { $avg: "$reviews.rating" },
+                totalReviews: { $size: "$reviews"}
+            }
+        },
         // {
         //     $unwind: {
         //         path: "$specialism",
@@ -129,6 +142,7 @@ const getAllTrainer = async (paginationOptions: IPaginationOptions, searchTerm: 
                     password: 0,
 
                 },
+                reviews: 0
             },
         },
     ]);
