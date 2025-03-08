@@ -108,13 +108,20 @@ const createAdminMessage = async (data: IChatAdmin): Promise<any> => {
 
 const getUserChats = async (data: any): Promise<IChat[]> => {
 
+    const userId = data?.receiver;
     const result = await Chats.find({
         $or: [
-            { sender: data?.sender, receiver: data?.receiver },
-            { sender: data?.receiver, receiver: data?.sender }
+            { sender: data?.sender, receiver: userId },
+            { sender: userId, receiver: data?.sender }
         ]
-    })
-    return result
+    });
+
+    await Chats.updateMany(
+        { sender: data?.sender, receiver: userId, readBy: { $ne: userId } },
+        { $push: { readBy: userId } }
+    );
+
+    return result;
 }
 
 const getAdminChats = async (data: any) => {
@@ -131,7 +138,6 @@ const getAdminChats = async (data: any) => {
     return result;
 
 };
-
 const getAlUserWithIChats = async (currentUserId: string) => {
     try {
         const result = await Chats.aggregate([
@@ -157,6 +163,20 @@ const getAlUserWithIChats = async (currentUserId: string) => {
                     },
                     lastMessage: { $first: "$message" },
                     lastMessageDate: { $first: "$createdAt" },
+                    unreadCount: {
+                        $sum: {
+                            $cond: {
+                                if: {
+                                    $and: [
+                                        { $eq: ["$receiver", new mongoose.Types.ObjectId(currentUserId)] }, // Must be received
+                                        { $not: { $in: [new mongoose.Types.ObjectId(currentUserId), "$readBy"] } }, // Not read by user
+                                    ],
+                                },
+                                then: 1,
+                                else: 0,
+                            },
+                        },
+                    },
                 },
             },
             {
@@ -196,6 +216,7 @@ const getAlUserWithIChats = async (currentUserId: string) => {
                     profileImageUrl: "$userDetails.profileImageUrl",
                     lastMessage: 1,
                     lastMessageDate: 1,
+                    unreadCount: 1, // Include unread messages count
                 },
             },
             {

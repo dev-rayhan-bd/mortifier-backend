@@ -1,4 +1,3 @@
-import { string } from 'zod';
 import { model, Schema } from "mongoose";
 import { IChat, IChatAdmin } from "./chats.interface";
 
@@ -18,7 +17,9 @@ const chatsSchema: Schema<IChat> = new Schema({
   message:
   {
     type: String, required: true
-  }
+  },
+  deliveredTo: [{ type: Schema.Types.ObjectId, default: [] }], // Users who received the message
+  readBy: [{ type: Schema.Types.ObjectId, default: [] }] // Users who read the message
 }, {
   timestamps: true
 });
