@@ -97,7 +97,7 @@ const getAllContent = async (
     user: any
 ): Promise<any> => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
-    const loggedInUserId = new mongoose.Types.ObjectId(user.id);
+    const loggedInUserId = new mongoose.Types.ObjectId(String(user.id));
 
     const andConditions = [];
     const contentSearchableFields = ["title", "content", "specialism"];
@@ -128,7 +128,7 @@ const getAllContent = async (
 
     const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
 
-    const aggregationPipeline = [
+    const aggregationPipeline: any = [
         { $match: whereConditions },
         { $match: { status: { $ne: "blocked" } } },
         {
@@ -162,10 +162,10 @@ const getAllContent = async (
                 from: "likes",
                 let: { contentId: "$_id" },
                 pipeline: [
-                    { 
-                        $match: { 
+                    {
+                        $match: {
                             $expr: { $eq: ["$contentId", "$$contentId"] }
-                        } 
+                        }
                     },
                 ],
                 as: "allLikes",
@@ -176,15 +176,15 @@ const getAllContent = async (
                 from: "likes",
                 let: { contentId: "$_id" },
                 pipeline: [
-                    { 
-                        $match: { 
-                            $expr: { 
+                    {
+                        $match: {
+                            $expr: {
                                 $and: [
-                                    { $eq: ["$contentId", "$$contentId"] }, 
-                                    { $eq: ["$userId", { $toObjectId: loggedInUserId }] } 
-                                ] 
-                            } 
-                        } 
+                                    { $eq: ["$contentId", "$$contentId"] },
+                                    { $eq: ["$userId", { $toObjectId: loggedInUserId }] }
+                                ]
+                            }
+                        }
                     },
                     { $limit: 1 }
                 ],
@@ -192,11 +192,68 @@ const getAllContent = async (
             },
         },
         {
+            $lookup: {
+                from: "likes",
+                let: { contentId: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$contentId", "$$contentId"] }
+                        }
+                    },
+                    { $sort: { createdAt: -1 } },
+                    { $limit: 5 },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "userId",
+                            foreignField: "_id",
+                            as: "likedUser",
+                        },
+                    },
+                    { $unwind: "$likedUser" },
+                    {
+                        $lookup: {
+                            from: "trainers",
+                            localField: "likedUser._id",
+                            foreignField: "user",
+                            as: "trainerInfo",
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: "trainees",
+                            localField: "likedUser._id",
+                            foreignField: "user",
+                            as: "traineeInfo",
+                        },
+                    },
+                    {
+                        $addFields: {
+                            userInfo: {
+                                $arrayElemAt: [{ $concatArrays: ["$trainerInfo", "$traineeInfo"] }, 0],
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: "$likedUser._id",
+                            firstName: "$userInfo.firstName",
+                            lastName: "$userInfo.lastName",
+                            profileImageUrl: "$userInfo.profileImageUrl",
+                            role: "$likedUser.role",
+                        },
+                    },
+                ],
+                as: "recentLikers",
+            },
+        },
+        {
             $addFields: {
                 userInfo: {
                     $arrayElemAt: [{ $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0],
                 },
-                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] }, 
+                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] },
                 totalLikes: { $size: "$allLikes" },
             },
         },
@@ -219,6 +276,7 @@ const getAllContent = async (
                 "userInfo.profileImageUrl": 1,
                 isLiked: 1,
                 totalLikes: 1,
+                recentLikers: 1
             },
         },
         { $sort: sortConditions },
@@ -317,10 +375,10 @@ const getAllContentForLogOutUsers = async (
                 from: "likes",
                 let: { contentId: "$_id" },
                 pipeline: [
-                    { 
-                        $match: { 
+                    {
+                        $match: {
                             $expr: { $eq: ["$contentId", "$$contentId"] }
-                        } 
+                        }
                     },
                 ],
                 as: "allLikes",
@@ -448,10 +506,10 @@ const getAllForAdminContent = async (
                 from: "likes",
                 let: { contentId: "$_id" },
                 pipeline: [
-                    { 
-                        $match: { 
+                    {
+                        $match: {
                             $expr: { $eq: ["$contentId", "$$contentId"] }
-                        } 
+                        }
                     },
                 ],
                 as: "allLikes",
@@ -462,15 +520,15 @@ const getAllForAdminContent = async (
                 from: "likes",
                 let: { contentId: "$_id" },
                 pipeline: [
-                    { 
-                        $match: { 
-                            $expr: { 
+                    {
+                        $match: {
+                            $expr: {
                                 $and: [
-                                    { $eq: ["$contentId", "$$contentId"] }, 
-                                    { $eq: ["$userId", { $toObjectId: loggedInUserId }] } 
-                                ] 
-                            } 
-                        } 
+                                    { $eq: ["$contentId", "$$contentId"] },
+                                    { $eq: ["$userId", { $toObjectId: loggedInUserId }] }
+                                ]
+                            }
+                        }
                     },
                     { $limit: 1 }
                 ],
@@ -482,7 +540,7 @@ const getAllForAdminContent = async (
                 userInfo: {
                     $arrayElemAt: [{ $concatArrays: ["$trainerDetails", "$traineeDetails"] }, 0],
                 },
-                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] }, 
+                isLiked: { $gt: [{ $size: "$likedByUser" }, 0] },
                 totalLikes: { $size: "$allLikes" },
             },
         },
