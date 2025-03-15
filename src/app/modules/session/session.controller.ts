@@ -34,6 +34,29 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const updateSessionDetails = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const files = req.files as {
+            [fieldname: string]: Express.Multer.File[];
+        };
+
+        const image = files.image?.[0];
+        const video = files.video?.[0];
+        const id = req.params.id
+        const content = JSON.parse(req.body.data)
+
+        const result = await sessionServices.updateSessionDetails(id, image, video, content)
+        res.status(200).json({
+            success: true,
+            message: 'session updated successfully',
+            data: result,
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 const getAllSession = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { limit, page, sortBy, sortOrder, searchTerm, ...filters } = req.query;
@@ -208,6 +231,7 @@ export const sessionController = {
     createSession,
     getAllSession,
     getAllSessionForAdmin,
+    updateSessionDetails,
     updateSession,
     getMySession,
     getSingleSession,
