@@ -37,6 +37,37 @@ const createSession = async (image: Express.Multer.File, video: Express.Multer.F
     return result;
 }
 
+const updateSessionDetails = async (
+    id: string,
+    image: Express.Multer.File | null,
+    video: Express.Multer.File | null,
+    content: any
+) => {
+
+    try {
+        if (image) {
+            const uploadedImage: any = await uploadToCloudinary(image);
+            content.promo_image = uploadedImage.secure_url;
+        }
+
+        if (video) {
+            const uploadedVideo: any = await uploadToCloudinary(video);
+            content.promo_video = uploadedVideo.secure_url;
+        }
+
+        const result = await TrainingSession.findByIdAndUpdate(
+            { _id: id },
+            content,
+            { new: true }
+        );
+
+        return result;
+    } catch (error) {
+        throw new AppError(400, 'Failed to update session details');
+    }
+};
+
+
 const updateSession = async (id: string, file: any, user: any, content: any) => {
 
     const uploadedImage: any = await uploadToCloudinary(file)
@@ -507,6 +538,7 @@ export const sessionServices = {
     createSession,
     getAllSession,
     getAllSessionForAdmin,
+    updateSessionDetails,
     updateSession,
     getMySession,
     getSingleSession,
