@@ -1,12 +1,12 @@
 import { ISpecialism } from "./specialism.interface"
 import { Specialism } from "./specialism.model"
 
-const createSpecialism = async (id: string, data: Partial<ISpecialism>): Promise<ISpecialism> => {
+const createSpecialism = async (id: string, data: Partial<ISpecialism>[]): Promise<ISpecialism[]> => {
 
-    const finalData = {
-        specialism: data?.specialism,
-        trainer_id: id
-    }
+    const finalData = data.map((item) => ({
+        specialism: item.specialism,
+        trainer_id: id,
+    }));
 
     const result = await Specialism.create(finalData)
     return result
