@@ -71,9 +71,9 @@ export const trainerValidatedSchema = z.object({
         invalid_type_error: "Face-to-face must be 'yes' or 'no'",
     }).optional(),
 
-    consultationType: z.enum(['paid', 'free'], {
+    consultationType: z.enum(['paid', 'free', 'both'], {
         required_error: "Consultation type is required",
-        invalid_type_error: "Consultation type must be 'paid' or 'free'",
+        invalid_type_error: "Consultation type must be 'paid', 'free' or 'both",
     }).optional(),
 
     qualification: z
