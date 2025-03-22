@@ -15,7 +15,7 @@ export interface ITrainer {
   about?: string;
   onlineSession?: 'yes' | 'no';
   faceToFace?: 'yes' | 'no';
-  consultationType?: 'paid' | 'free';
+  consultationType?: 'paid' | 'free' | 'both';
   qualification?: string[];
   specialism?: string[];
   radius?: string;

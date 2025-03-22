@@ -53,7 +53,7 @@ const trainerSchema = new Schema<ITrainer>(
     },
     consultationType: {
       type: String,
-      enum: ['paid', 'free'],
+      enum: ['paid', 'free', 'both'],
     },
     qualification: {
       type: [String],
