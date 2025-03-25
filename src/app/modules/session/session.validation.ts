@@ -45,6 +45,11 @@ export const trainingSessionValidatedSchema = z.object({
         invalid_type_error: "Fitness focus must be a string",
     }),
 
+    description: z.string({
+        required_error: "Description is required",
+        invalid_type_error: "Description must be a string",
+    }).optional(),
+
     otherFocus: z.string({
         required_error: "Other focus is required",
         invalid_type_error: "Other focus must be a string",

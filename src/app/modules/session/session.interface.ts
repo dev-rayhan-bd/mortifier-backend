@@ -14,6 +14,7 @@ export interface ITrainingSession {
     // sessionMode: "group" | ;
     status?: "in-progress" | "blocked";
     fitnessFocus: string;
+    description?: string;
     otherFocus?: string;
     recordedContent?: Video[];
     accessType: "free" | "membership" | "followers";
