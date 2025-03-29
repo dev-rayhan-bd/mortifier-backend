@@ -30,6 +30,11 @@ router.post('/change-admin-password',
     , authController.changeAdminPassword)
 
 router.post(
+    '/forget-admin-password',
+    authController.forgetAdminPassword
+);
+
+router.post(
     '/forget-password',
     authController.forgetPassword
 );

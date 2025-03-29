@@ -108,6 +108,22 @@ const changeAdminPassword = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
+const forgetAdminPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+
+    const result = await authServices.forgetAdminPassword(email)
+
+    res.status(200).json({
+      success: true,
+      message: 'sent verification code successfully',
+    })
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 const forgetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
@@ -160,6 +176,7 @@ export const authController = {
   createRefreshToken,
   changePassword,
   changeAdminPassword,
+  forgetAdminPassword,
   forgetPassword,
   verifyCode,
   resetPassword,
