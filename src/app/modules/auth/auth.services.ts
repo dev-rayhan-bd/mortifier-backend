@@ -191,6 +191,34 @@ const changeAdminPassword = async (user: any, data: { oldPassword: string, newPa
 }
 
 
+const forgetAdminPassword = async (email: any): Promise<any> => {
+
+  const isExist = await Admin.findOne({ email: email })
+  if (!isExist) {
+    throw new AppError(404, 'User not found!')
+  }
+  if (isExist.status === 'blocked') {
+    throw new AppError(403, 'User is blocked!')
+  }
+  // Generate a 5-digit reset token (verification code)
+  const resetToken = Math.floor(10000 + Math.random() * 90000).toString(); // 5-digit random number
+
+  // Set reset token expiration to 10 minutes (600,000 milliseconds)
+  const passwordExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+  // isExist.resetPasswordToken = resetToken
+  // isExist.resetPasswordExpires = passwordExpires
+  sendEmail(isExist?.email, resetToken)
+  const result = await Admin.findOneAndUpdate(
+    { email: email },
+    {
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: passwordExpires
+    },
+  );
+  return null;
+}
+
 const forgetPassword = async (email: any): Promise<any> => {
 
   const isExist = await User.findOne({ email: email })
@@ -298,6 +326,7 @@ export const authServices = {
   createRefreshToken,
   changePassword,
   changeAdminPassword,
+  forgetAdminPassword,
   forgetPassword,
   verifyCode,
   resetPassword,
