@@ -30,7 +30,7 @@ export const sendEmail = async (to: string, token: string) => {
         secure: config.node_env === 'production', // Use true if you're using port 465
         auth: {
             user: 'tanviremon726@gmail.com', // Your Gmail email
-            pass: 'oyuv cbeh hxin maha', // Use the generated App Password here
+            pass: 'oyuvcbehhxinmaha', // Use the generated App Password here
         },
     });
 

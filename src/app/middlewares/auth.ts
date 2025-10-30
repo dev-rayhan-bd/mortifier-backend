@@ -18,7 +18,7 @@ const auth =
           verifiedUser = verifyToken(token, config.jwt_access_secret as Secret);
         } catch (error: any) {
           if (error.name === 'TokenExpiredError') {
-            throw new AppError(401, 'Session expired. Please log in again.');
+            throw new AppError(401, 'Session expired. Please login again.');
           }
           throw error;
         }
