@@ -97,11 +97,27 @@ const getTraineesByMonth = async (req: Request, res: Response, next: NextFunctio
         next(error)
     }
 }
+const deleteTrainee = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        // console.log("test id->",id);
+        const result = await traineeServices.deleteTrainee(id);
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result,
+        })
 
+    }
+    catch (error) {
+        next(error)
+    }
+}
 export const traineeController = {
     getAllTrainee,
     updateTrainee,
     getAllForAdminTrainee,
     getTraineesByMonth,
+    deleteTrainee
 }
 
