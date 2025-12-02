@@ -323,6 +323,23 @@ const blockUnblock = async (id: string): Promise<any> => {
         message: `user ${result?.status}`
     }
 }
+// delete user
+const deleteUser = async (id: string): Promise<any> => {
+
+    const user = await User.findById(id);
+    
+
+    if (!user) {
+        throw new AppError(400, 'User does not exist');
+    }
+
+    await User.findByIdAndDelete(id);
+
+ 
+    return {
+        message: `User with ID ${id} has been successfully deleted.`,
+    };
+}
 
 
 export const userServices = {
@@ -332,5 +349,6 @@ export const userServices = {
     viewUser,
     newUser,
     blockUnblock,
+    deleteUser
     // getMeTrainee,
 }

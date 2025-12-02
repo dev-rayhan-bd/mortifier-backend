@@ -20,6 +20,7 @@ router.get('/get-me', auth(), userController.getMe)
 router.get('/view-user/:id', auth(), userController.viewUser)
 router.get('/new-users', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), userController.newUser)
 router.patch('/block-unblock/:id', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), userController.blockUnblock)
+router.delete('/delete-user/:id', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), userController.deleteUser)
 // router.get('/get-me-trainee', auth(), userController.getMeTrainee)
 
 export const UserRouter = router;

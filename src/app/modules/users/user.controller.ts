@@ -139,6 +139,22 @@ const blockUnblock = async (req: Request, res: Response, next: NextFunction) => 
         next(error)
     }
 }
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id
+        console.log("test id->",id);
+        const result = await userServices.deleteUser(id);
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result,
+        })
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
 
 // const getMeTrainee = async (req: Request, res: Response, next: NextFunction) => {
 //     try {
@@ -169,5 +185,6 @@ export const userController = {
     viewUser,
     newUser,
     blockUnblock,
+    deleteUser
     // getMeTrainee,
 }
