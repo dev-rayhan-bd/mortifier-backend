@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { createToken } from "../../helpers/jwtHelper";
 import config from "../../config";
 import { uploadToCloudinary } from "../../helpers/fileUploader";
+import AppError from "../../errors/AppError";
 
 
 const getAllTrainee = async (paginationOptions: IPaginationOptions, searchTerm: any) => {
@@ -230,9 +231,29 @@ const getTraineesByMonth = async () => {
     return allMonths;
 };
 
+// delete user
+const deleteTrainee = async (id: string): Promise<any> => {
+
+    const user = await Trainee.findById(id);
+    
+
+    if (!user) {
+        throw new AppError(400, 'User does not exist');
+    }
+
+    await Trainee.findByIdAndDelete(id);
+
+ 
+    return {
+        message: `User with ID ${id} has been successfully deleted.`,
+    };
+}
+
+
 export const traineeServices = {
     getAllTrainee,
     updateTrainee,
     getAllForAdminTrainee,
     getTraineesByMonth,
+    deleteTrainee
 }
