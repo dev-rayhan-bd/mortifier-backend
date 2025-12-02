@@ -12,5 +12,5 @@ router.get('/dashboard', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
 router.patch('/:id',
     upload.single('file'), auth(ENUM_USER_ROLE.TRAINEE, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN), traineeController.updateTrainee)
 
-
+router.delete('/delete-trainee/:id', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), traineeController.deleteTrainee)
 export const TraineeRouter = router;

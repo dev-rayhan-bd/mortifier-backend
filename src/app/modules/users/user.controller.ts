@@ -142,7 +142,7 @@ const blockUnblock = async (req: Request, res: Response, next: NextFunction) => 
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id
-        console.log("test id->",id);
+        // console.log("test id->",id);
         const result = await userServices.deleteUser(id);
         res.status(200).json({
             success: true,
